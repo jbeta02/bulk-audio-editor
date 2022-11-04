@@ -1,15 +1,4 @@
-/*
- * Name:        Jesus Betancourt
- *
- * Course:      CS-12, Fall 2022
- *
- * Date:        10/27/22
- *
- * Filename:    Log.java
- *
- * Purpose:     To act as a wrapper to System.out.println() and to provide testing utilities
- */
-
+// To act as a wrapper to System.out.println() and to provide testing utilities
 public class Log {
 
     // print headers
@@ -39,16 +28,16 @@ public class Log {
 
     // print functions for logging errors
 
-//    public static void  error(String message, Object value){
-//        print(ERROR, message, value);
-//    }
-
-    public static void error(String message, String exceptionMessage){
-        print(ERROR, message + EXCEPTION_START, exceptionMessage);
+    public static void  error(String message, Object value){
+        print(ERROR, message, value);
     }
 
     // overloaded error, make message empty, print value
     public static void error(Object value){
         print(ERROR, "", value);
+    }
+
+    public static void errorE(String message, Exception exceptionMessage){
+        print(ERROR, message + EXCEPTION_START, exceptionMessage.getMessage());
     }
 }
