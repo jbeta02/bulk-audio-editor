@@ -1,12 +1,13 @@
-// Purpose: Provide interface for user to interact with program
+// Purpose: Main class, run program
 
 import java.util.Scanner;
 
-public class ProgramUI { //TODO consider transferring to Main
+public class Program {
 
-    private Scanner input = new Scanner(System.in);
+    private static Scanner input = new Scanner(System.in);
 
-    public void runCycle(){
+    // main method, provide user interface and run commands
+    public static void main(String[] args){
         MP3Editor mp3Editor;
         String command;
         String commandInput = "";
@@ -45,7 +46,8 @@ public class ProgramUI { //TODO consider transferring to Main
         }
     }
 
-    private void displayHelp(){
+    // display command options and descriptions
+    private static void displayHelp(){
         String format = "%-30s %s\n";
         // file name, artist, album, genre
         String displayFormat = "%s %s %s %s";
