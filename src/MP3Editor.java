@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
 
-// Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
+// Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
 public class MP3Editor {
 
     private ArrayList<MP3File> mp3Files = new ArrayList<>();

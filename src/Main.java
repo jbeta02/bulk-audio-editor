@@ -1,4 +1,4 @@
-// Main program class
+// Purpose: Main program class
 public class Main {
     public static void main(String[] args) {
 

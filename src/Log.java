@@ -1,4 +1,4 @@
-// To act as a wrapper to System.out.println() and to provide testing utilities
+// Purpose: To act as a wrapper to System.out.println() and to provide testing utilities
 public class Log {
 
     // print headers
