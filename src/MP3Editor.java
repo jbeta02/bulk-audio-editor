@@ -10,7 +10,8 @@ import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
 
 // Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
-public class MP3Editor {
+
+public class MP3Editor { //TODO explore syntax for flac files
 
     private ArrayList<MP3File> mp3Files = new ArrayList<>();
 
@@ -91,7 +92,7 @@ public class MP3Editor {
 
             // get file properties from mp3 obj then get path
             Path oldFilePath = Paths.get(file.getFile().getPath());
-            // get file properties from mp3 obj then get path without a file name so add newName as file
+            // get file properties from mp3 obj then get path without a file name, add newName as file
             Path newFilePath = Paths.get(getPathNoName(file.getFile()) + newName);
 
             try{
@@ -106,8 +107,34 @@ public class MP3Editor {
     }
 
     public void removeFromFileName(String textToRemove){
-        //TODO continue from here
+        String currentName;
+        String newName;
+
+        // get names
+        for (MP3File file : mp3Files){
+            // save the current name
+            currentName = file.getFile().getName();
+
+            // remove target text from file
+            newName = currentName.replace(textToRemove, "");
+
+            // get file properties from mp3 obj then get path
+            Path oldFilePath = Paths.get(file.getFile().getPath());
+            // get file properties from mp3 obj then get path without a file name, add newName as file
+            Path newFilePath = Paths.get(getPathNoName(file.getFile()) + newName);
+
+            try{
+                Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+            }
+            catch (Exception e){
+                Log.errorE("Failed to save file with new name", e);
+            }
+
+            //TODO delete old file when done (complete this after testing thoroughly)
+        }
     }
+
+    //TODO start metadata modifiers
 
     // return file's path but exclude the file from the path string
     private String getPathNoName(File file){
