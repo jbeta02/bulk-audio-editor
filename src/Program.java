@@ -22,7 +22,7 @@ public class Program {
 
         command = promptForCommand(); // command = array [command, commandInput]
 
-        while(!command[0].equals("-q")){
+        while(!command[0].equals("-q") & !command[0].equals("q")){
             switch(command[0]){
                 case "-ab":
                     mp3Editor.addToFileName(true, command[1]);
@@ -92,7 +92,7 @@ public class Program {
         //System.out.printf(displayFormat, "-D: ", "Display command will display the metadata of the files");
         System.out.printf(format, "-dB [dB level]: ", "Normalize command will take a float value in db to normalize files to");
         System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
-        System.out.printf(format, "-n [path to files]: ", "New command select new set of files or files to target");
-        System.out.printf(format, "-q: ", "Quit command will terminate program");
+        System.out.printf(format, "-n [path to files]: ", "New command will select new set of files or file to target");
+        System.out.printf(format, "-q or q: ", "Quit command will terminate program");
     }
 }
