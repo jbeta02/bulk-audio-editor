@@ -2,5 +2,9 @@
 /shelf/
 /workspace.xml
 
-#ignore out folder (contains .class files)
+# out folder (contains .class files)
 out/
+
+# IDE files but still track .gitigonre
+.idea/
+!.gitignore
