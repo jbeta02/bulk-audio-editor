@@ -8,6 +8,8 @@ import java.util.ArrayList;
 // jaudiotagger is an external library for manipulating mp3 files
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.FieldKey;
+import org.jaudiotagger.tag.Tag;
 
 // Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
 
@@ -46,7 +48,7 @@ public class MP3Editor { //TODO explore syntax for flac files
         }
 
         // check if path leads to file
-        if (!file.isDirectory() & file.isFile()){
+        else if (!file.isDirectory() & file.isFile()){
             Log.print("is file");
 
             // might not be able to read file
@@ -65,7 +67,7 @@ public class MP3Editor { //TODO explore syntax for flac files
         }
 
         // path resulted in neither folder nor file, or led to both folder and file
-        else{
+        else {
             Log.error("Unable to determine if path leads to folder or file");
             Log.error("isFolder, isFile", file.isDirectory() +  " , " + file.isFile());
         }
@@ -134,7 +136,44 @@ public class MP3Editor { //TODO explore syntax for flac files
         }
     }
 
-    //TODO start metadata modifiers
+    // general algorithm for modifying metadata
+    private void modifySimpleMetadata(FieldKey fieldKey, String text){
+        for (MP3File file : mp3Files){
+            // get tag which contains metadata
+            Tag tag = file.getTag();
+
+            Log.print("old " + fieldKey.name() + " text", tag.getFirst(fieldKey));
+
+            try {
+                // set new metadata value
+                tag.setField(fieldKey, text);
+
+                // save new value
+                file.commit();
+            }
+            // might not be able to write data
+            catch (Exception e) {
+                Log.errorE("Unable to set new album text", e);
+            }
+
+            Log.print("new " + fieldKey.name() + " text", tag.getFirst(fieldKey));
+        }
+    }
+
+    // change artist text
+    public void modifyArtist(String artistText){
+        modifySimpleMetadata(FieldKey.ARTIST, artistText);
+    }
+
+    // change album text
+    public void modifyAlbum(String albumText){
+        modifySimpleMetadata(FieldKey.ALBUM, albumText);
+    }
+
+    // change genre text
+    public void modifyGenre(String genreText){
+        modifySimpleMetadata(FieldKey.GENRE, genreText);
+    }
 
     // return file's path but exclude the file from the path string
     private String getPathNoName(File file){
