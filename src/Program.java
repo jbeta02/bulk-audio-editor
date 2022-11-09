@@ -1,4 +1,4 @@
-// Purpose: Main class, run program
+// Purpose: Main program class, prompt for and run commands
 
 import java.util.Scanner;
 

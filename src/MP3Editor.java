@@ -97,6 +97,9 @@ public class MP3Editor { //TODO explore syntax for flac files
             // get file properties from mp3 obj then get path without a file name, add newName as file
             Path newFilePath = Paths.get(getPathNoName(file.getFile()) + newName);
 
+            Log.print("old name", currentName);
+            Log.print("new name", newName);
+
             try{
                 Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
@@ -124,6 +127,9 @@ public class MP3Editor { //TODO explore syntax for flac files
             Path oldFilePath = Paths.get(file.getFile().getPath());
             // get file properties from mp3 obj then get path without a file name, add newName as file
             Path newFilePath = Paths.get(getPathNoName(file.getFile()) + newName);
+
+            Log.print("old name", currentName);
+            Log.print("new name", newName);
 
             try{
                 Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -173,6 +179,10 @@ public class MP3Editor { //TODO explore syntax for flac files
     // change genre text
     public void modifyGenre(String genreText){
         modifySimpleMetadata(FieldKey.GENRE, genreText);
+    }
+
+    public void changeArt(){
+        //TODO continue here
     }
 
     // return file's path but exclude the file from the path string
