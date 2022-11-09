@@ -1,1 +1,9 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# out folder (contains .class files)
 /out/
+
+# IDE files
+/.idea/
