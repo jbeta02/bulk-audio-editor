@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -8,12 +9,16 @@ import java.util.ArrayList;
 // jaudiotagger is an external library for manipulating mp3 files
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.tag.FieldDataInvalidException;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.images.Artwork;
+import org.jaudiotagger.tag.images.ArtworkFactory;
+import org.jaudiotagger.tag.images.StandardArtwork;
 
 // Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
 
-public class MP3Editor { //TODO explore syntax for flac files
+public class MP3Editor {
 
     private ArrayList<MP3File> mp3Files = new ArrayList<>();
 
@@ -181,8 +186,33 @@ public class MP3Editor { //TODO explore syntax for flac files
         modifySimpleMetadata(FieldKey.GENRE, genreText);
     }
 
-    public void changeArt(){
-        //TODO continue here
+    public void changeArt(String pathToArt){
+        for (MP3File file : mp3Files){
+            // get tag which contains metadata
+            Tag tag = file.getTag();
+
+            try {
+                // create Artwork obj using ArtworkFactory with pathToArt as input
+                Artwork artwork = ArtworkFactory.createArtworkFromFile(new File(pathToArt));
+
+                // set new cover art
+                tag.setField(artwork);
+
+                // save new cover art
+                file.commit();
+
+                //TODO do more testing on created files. Why can't I see them (trying checking for them with cmd)
+
+                // will create an "AlbumArtSmall.jpg"
+                // will create a "Folder.jpg"
+
+                // files seem to be created when Windows Media Player is opened. Files can be deleted after they are created
+                // without any apparent consequence
+
+            } catch (Exception e) {
+                Log.errorE("Unable to set art cover using path: " + pathToArt, e);
+            }
+        }
     }
 
     // return file's path but exclude the file from the path string
