@@ -19,11 +19,13 @@ public class Program {
         System.out.println("Enter path to a single Mp3 file or a folder holding MP3 files");
         System.out.println("(enter \"help\" for more information)");
 
+        // prompt for valid path
         path = promptForPath();
 
         // create mp3Editor obj and inter path to mp3 files as constructor argument
         mp3Editor = new MP3Editor(path);
 
+        // prompt for command
         command = promptForCommand(); // command = array [command, commandInput]
 
         while(!command[0].equals("-q") & !command[0].equals("q")){
@@ -58,6 +60,12 @@ public class Program {
                 case "-h":
                     displayHelp();
                     break;
+
+                default:
+                    System.out.println("\nPlease enter a valid command. Below is a list of all commands.");
+                    System.out.println("(List of commands can be produced again using \"-h\" command)\n");
+                    displayHelp();
+                    break;
             }
             command = promptForCommand();
         }
@@ -70,7 +78,7 @@ public class Program {
                 "- Album\n" +
                 "- Artist\n" +
                 "- Genre\n" +
-                "- Cover Act\n" +
+                "- Cover Art\n" +
                 "and more\n" +
                 "After entering a path use the -h command to display all available commands.\n\n");
     }
@@ -95,24 +103,28 @@ public class Program {
         System.out.printf(format, "-q or q: ", "Quit command will terminate program");
     }
 
+    // recursively prompt for path until a valid path is entered
     private static String promptForPath(){
         String path;
 
+        // prompt for path
         System.out.print("Enter path: ");
-
         path = input.nextLine();
 
+        // create path obj so the path can be validated
         File file = new File(path);
 
+        // if a valid path isn't entered then re-prompt until it is
         if (file.isDirectory() || file.isFile()){
             return path;
         }
         else {
-            Log.error("Path not found. Please enter a valid path");
+            Log.error("Path not found. Please enter a valid path. Ex: C:\\folder\\folder\\");
 
             if (path.equals("help")){
                 displayAbout();
             }
+
             return promptForPath();
         }
     }
