@@ -215,6 +215,15 @@ public class MP3Editor {
     }
 
     // implementation of loudness normalization
+    // references:
+    //    https://en.wikipedia.org/wiki/Audio_normalization
+    //    https://en.wikipedia.org/wiki/ReplayGain
+    //    https://wiki.hydrogenaud.io/index.php?title=ReplayGain_specification
+
+    //    https://developers.google.com/assistant/tools/audio-loudness
+
+    //    https://producerhive.com/music-production-recording-tips/lufs-vs-dbfs-differences/#:~:text=LUFS%20is%20a%20measurement%20of,level%2C%20without%20human%20perceptual%20filters.
+
     public void normalizeVolume(double dB){
 
     }
