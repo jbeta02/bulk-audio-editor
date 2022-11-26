@@ -165,18 +165,61 @@ public class MP3Editor {
         }
     }
 
+    // display data of all audio files in folder (order by name)
     public void displayData(){
-        //TODO cont here
-
-        // get all songs then print list of songs and data
-
+        // print top data
         // folder name      total files
+        if (mp3Files.size() > 0){
+            System.out.printf("%s %-50s %s %s\n\n", "Path:", getPathNoName(mp3Files.get(0).getFile()), "Total File Count:" , mp3Files.size());
+        }
+        else {
+            System.out.println("No files in folder");
+        }
 
+        // format for file data
+        String format = "%-50s %-30s %-30s %-30s %-30s\n";
+
+        // print header
+        System.out.printf(format,
+                "Name",
+                "Album",
+                "Artist",
+                "Genre",
+                "Length"
+        );
+
+        // print file data
         // name     artist      album   genre       len
+        for (MP3File file : mp3Files){
+            Tag tag = file.getTag();
 
-        System.out.printf("%s %s", getPath(), );
+            System.out.printf(format,
+                    file.getFile().getName(),
+                    tag.getFirst(FieldKey.ALBUM),
+                    tag.getFirst(FieldKey.ARTIST),
+                    tag.getFirst(FieldKey.GENRE),
+                    convertToMinSec(file.getAudioHeader().getTrackLength())
+            );
+        }
+    }
+
+    // display data order by album name
+    public void displayDataAlbum(){
+        //TODO work on displayDataAlbum(), might structure this and displayData() so one is the overload of the other
+    }
+
+    // create folders based on X then put the target files in the corresponding folders where x is
+    // metadata such as Album, Artist, Genre
+    public void createFoldersFor(FieldKey sortCriteria){
+        //TODO work on createFoldersFor()
+    }
+
+    // implementation of loudness normalization
+    public void normalizeVolume(double dB){
 
     }
+
+    // private utility methods for class ----------------------------------------------
 
     // return file's path but exclude the file from the path string
     private String getPathNoName(File file){
@@ -189,6 +232,14 @@ public class MP3Editor {
         String newPath = currentPath.substring(0, currentPath.lastIndexOf("\\") + 1);
 
         return newPath;
+    }
+
+    private String convertToMinSec(int seconds){
+        int min = seconds / 60;
+
+        int sec = seconds % 60;
+
+        return String.format("%d:%02d", min, sec);
     }
 
     // accessors and mutators ----------------------------------------------
@@ -248,9 +299,8 @@ public class MP3Editor {
         return path;
     }
 
-    public boolean setPath(String path){
+    public void setPath(String path){
         // check if path is valid
-        boolean pathSet = false;
 
         // create path obj so the path can be validated
         File file = new File(path);
@@ -258,12 +308,9 @@ public class MP3Editor {
         // set path if valid
         if (file.isDirectory() || file.isFile()){
             this.path = path;
-            pathSet = true;
         }
         else {
-            Log.error("Path not found.");
+            Log.error("Path " + path + " is invalid. Program will default to empty path.");
         }
-
-        return pathSet;
     }
 }

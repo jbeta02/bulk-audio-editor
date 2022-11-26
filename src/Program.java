@@ -8,7 +8,7 @@ public class Program {
     private static Scanner input = new Scanner(System.in);
 
     // main method, provide user interface and run commands
-    public static void main(String[] args){
+    public static void main(String[] args){ //TODO when Version 1 finished create a releases tag
         MP3Editor mp3Editor;
         String[] command;
         String path;
@@ -57,6 +57,9 @@ public class Program {
                 case "-Art":
                     mp3Editor.changeArt(command[1]);
 
+                case "-D":
+                    mp3Editor.displayData();
+
                 case "-h":
                     displayHelp();
                     break;
@@ -86,8 +89,6 @@ public class Program {
     // display command options and descriptions
     private static void displayHelp(){
         String format = "%-30s %s\n";
-        // file name, artist, album, genre
-        String displayFormat = "%s %s %s %s";
 
         System.out.printf(format, "-ab [text]: ", "Add command will add [text] to beginning");
         System.out.printf(format, "-ae [text]: ", "Add command will add [text] to end");
@@ -96,7 +97,7 @@ public class Program {
         System.out.printf(format, "-A [album text]: ", "Album command will add [album text] to album metadata of files");
         System.out.printf(format, "-G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
         System.out.printf(format, "-Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
-        //System.out.printf(displayFormat, "-D: ", "Display command will display the metadata of the files");
+        System.out.printf(format, "-D: ", "Display command will display the metadata of the files");
         System.out.printf(format, "-dB [dB level]: ", "Normalize command will take a float value in db to normalize files to");
         System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
         System.out.printf(format, "-n [path to files]: ", "New command will select new set of files or file to target");
@@ -119,7 +120,7 @@ public class Program {
             return path;
         }
         else {
-            Log.error("Path not found. Please enter a valid path. Ex: C:\\folder\\folder\\");
+            Log.error("Path not found. Please enter a valid path. Ex: C:\\folder1\\folder2\\");
 
             if (path.equals("help")){
                 displayAbout();
