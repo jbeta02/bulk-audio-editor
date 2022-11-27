@@ -220,10 +220,12 @@ public class MP3Editor {
     //    https://en.wikipedia.org/wiki/ReplayGain
     //    https://wiki.hydrogenaud.io/index.php?title=ReplayGain_specification
 
-    //    https://developers.google.com/assistant/tools/audio-loudness
-
     //    https://producerhive.com/music-production-recording-tips/lufs-vs-dbfs-differences/#:~:text=LUFS%20is%20a%20measurement%20of,level%2C%20without%20human%20perceptual%20filters.
 
+    // https://superuser.com/questions/323119/how-can-i-normalize-audio-using-ffmpeg
+    // http://k.ylo.ph/2016/04/04/loudnorm.html
+
+    // TODO use FFmpeg to implement loudness normalization
     public void normalizeVolume(double dB){
 
     }
