@@ -133,8 +133,9 @@ public class Program {
             return promptForPath();
         }
     }
-
     // prompt for command, returns [command, commandInput] as array
+    //TODO consider command system for adding modifiers for
+    //TODO consider system for adding output files in addition to the input files
     private static String[] promptForCommand(){
         System.out.print("\nEnter command: ");
         String command = input.nextLine();
