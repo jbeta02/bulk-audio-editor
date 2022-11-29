@@ -5,6 +5,10 @@ import java.util.Scanner;
 
 public class Program {
 
+    //TODO refactor all code:
+    // change fuct(){ to funct() {
+    // change for loop on list (x: y) to (x : y)
+
     private static Scanner input = new Scanner(System.in);
 
     // main method, provide user interface and run commands

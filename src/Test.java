@@ -8,7 +8,13 @@ public class Test {
 
         //mp3Editor.removeFromFileName("2");
 
-        mp3Editor.displayData();
+        //mp3Editor.displayData();
+
+        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-She's Back .mp3\""; //in-She's Back
+        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out1-She's Back .mp3\"";
+
+        //TODO test values with other test files
+        mp3Editor.normalizeVolume(inputFile, outputFile, -14, -5, 11);
 
     }
 }

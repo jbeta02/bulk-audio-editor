@@ -1,4 +1,4 @@
-import java.io.File;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -6,6 +6,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 
 // jaudiotagger is an external library for manipulating mp3 files
+import javafx.util.Pair;
 import org.jaudiotagger.audio.AudioFileIO;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldKey;
@@ -224,8 +225,70 @@ public class MP3Editor {
 
     //    https://producerhive.com/music-production-recording-tips/lufs-vs-dbfs-differences/#:~:text=LUFS%20is%20a%20measurement%20of,level%2C%20without%20human%20perceptual%20filters.
 
-    public void normalizeVolume(double dB){
+    //TODO look at the following for ideas on how to improve normalization algorithm
+    // https://superuser.com/questions/323119/how-can-i-normalize-audio-using-ffmpeg
+    // - go through ffmpeg-normalize tool to get ideas
+    // - look at option 3 from superuser post
+    // - consider adding volume normalization (peak and RMS)
 
+    public void normalizeVolume(String inputFile, String outputFile, double targetLUFS, double truePeak, double LRA){
+        try{
+            String ffmpeg = "ffmpeg/bin/ffmpeg.exe";
+
+            double measuredI;
+            double measuredTp;
+            double measuredLRA;
+            double measuredThresh;
+            double offset;
+
+            String[] passOne = {"-i", inputFile, "-af",
+                    "loudnorm=" +
+                            "I=" + targetLUFS +
+                            ":TP=" + truePeak +
+                            ":LRA=" + LRA +
+                            ":print_format=json",
+                    "-hide_banner", "-f", "null", "-"};
+
+            Log.print("running command (pass one)", ffmpeg + arrayToString(passOne));
+            ArrayList<String> command1Result = runFfmpegCommand(passOne);
+
+            for (String outputLine: command1Result){
+                Log.print("command output", outputLine);
+            }
+
+            ArrayList<Pair<String, Double>> loudnessData = extractLoudnessStats(command1Result);
+
+            measuredI = loudnessData.get(0).getValue();
+            measuredTp = loudnessData.get(1).getValue();
+            measuredLRA = loudnessData.get(2).getValue();
+            measuredThresh = loudnessData.get(3).getValue();
+            offset = loudnessData.get(4).getValue();
+
+
+            String[] passTwo = {"-i", inputFile, "-af",
+                    "loudnorm=" +
+                            "I=" + targetLUFS +
+                            ":TP=" + truePeak +
+                            ":LRA=" + LRA +
+                            ":measured_I=" + measuredI +
+                            ":measured_LRA=" + measuredLRA +
+                            ":measured_TP=" + measuredTp +
+                            ":measured_thresh=" + measuredThresh +
+                            ":offset=" + offset +
+                            ":linear=true" +
+                            ":print_format=json",
+                    "-hide_banner", "-ar", "48k", outputFile};
+
+            Log.print("running command (pass two)", ffmpeg + arrayToString(passTwo));
+            ArrayList<String> command2Result = runFfmpegCommand(passTwo);
+
+            for (String outputLine: command2Result){
+                Log.print("command output", outputLine);
+            }
+        }
+        catch (Exception e){
+            Log.errorE("error running ffmpeg", e);
+        }
     }
 
     // private utility methods for class ----------------------------------------------
@@ -249,6 +312,98 @@ public class MP3Editor {
         int sec = seconds % 60;
 
         return String.format("%d:%02d", min, sec);
+    }
+
+    // run an FFmpeg command and collect its output
+    private ArrayList<String> runFfmpegCommand(String[] args){
+        // ArrayList will hold output lines
+        ArrayList<String> output = new ArrayList<>();
+
+        try{
+            // ArrayList will hold arguments that make up command
+            ArrayList<String> command = new ArrayList<>();
+
+            // start with FFmpeg
+            String ffmpeg = "ffmpeg/bin/ffmpeg.exe";
+            command.add(ffmpeg);
+
+            // add the other args
+            for (String arg: args){
+                command.add(arg);
+            }
+
+            // run ffmpeg exe
+            ProcessBuilder build = new ProcessBuilder(command);
+            build.redirectErrorStream(true);
+            Process process = build.start();
+
+            // wait for completion of FFmpeg command
+            process.waitFor();
+
+            // read exe output stream
+            InputStream inputStream = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
+            // collect output
+            for(Object line: reader.lines().toArray()){
+                String stringLine = (String) line;
+                output.add(stringLine);
+            }
+
+            // close stream since no longer needed
+            inputStream.close();
+        }
+        catch (Exception e){
+            Log.errorE("error running ffmpeg", e);
+        }
+
+        return output;
+    }
+
+    private String arrayToString(String[] stringArray){
+        String string = "";
+        for (String s : stringArray) {
+            string += " " + s;
+        }
+
+        return string;
+    }
+
+    private ArrayList<Pair<String, Double>> extractLoudnessStats(ArrayList<String> outputLines){
+        ArrayList<Pair<String, Double>> targetData = new ArrayList<>();
+
+        for (String line : outputLines){
+            if (line.contains("input_i")){
+                targetData.add(extractJsonKeyValue(line));
+            }
+            if (line.contains("input_tp")){
+                targetData.add(extractJsonKeyValue(line));
+            }
+            if (line.contains("input_lra")){
+                targetData.add(extractJsonKeyValue(line));
+            }
+            if (line.contains("input_thresh")){
+                targetData.add(extractJsonKeyValue(line));
+            }
+            if (line.contains("target_offset")){
+                targetData.add(extractJsonKeyValue(line));
+                break;
+            }
+        }
+
+        return targetData;
+    }
+
+    private Pair<String, Double> extractJsonKeyValue(String jsonLine){
+        jsonLine = jsonLine.replace("\"", "").replace(",", "");
+        String[] LineParts = jsonLine.split(":");
+
+        String key = LineParts[0].trim();
+        double value  = Double.parseDouble(LineParts[1].trim());
+
+        //Log.print("extracted Data", key + ", " + value);
+
+        return new Pair<>(key, value);
     }
 
     // accessors and mutators ----------------------------------------------
@@ -294,7 +449,8 @@ public class MP3Editor {
                 MP3File convertedFile = (MP3File) AudioFileIO.read(file);
 
                 mp3Files.add(convertedFile);
-            } catch (Exception e) {
+            }
+            catch (Exception e) {
                 Log.error("Unable to internally classify file with name", file.getName());
                 Log.error("Error msg", e.getMessage());
             }
