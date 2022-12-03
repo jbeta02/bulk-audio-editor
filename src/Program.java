@@ -6,7 +6,7 @@ import java.util.Scanner;
 public class Program {
 
     //TODO refactor all code:
-    // change fuct(){ to funct() {
+    // change funct(){ to funct() {
     // change for loop on list (x: y) to (x : y)
 
     private static Scanner input = new Scanner(System.in);
@@ -60,9 +60,21 @@ public class Program {
 
                 case "-Art":
                     mp3Editor.changeArt(command[1]);
+                    break;
 
                 case "-D":
                     mp3Editor.displayData();
+                    break;
+
+                case "-LN":
+                    mp3Editor.normalizeFiles(command[2]);
+                    break;
+
+                case "-LNN":
+                    if (isDouble(command[1])){
+                        mp3Editor.normalizeFiles(Double.parseDouble(command[1]), command[2]);
+                    }
+                    break;
 
                 case "-h":
                     displayHelp();
@@ -94,6 +106,8 @@ public class Program {
     private static void displayHelp(){
         String format = "%-30s %s\n";
 
+        //TODO add section about -o (output file path or output folder path)
+        //TODO add -Di (display loudness stats) -n and -q command
         System.out.printf(format, "-ab [text]: ", "Add command will add [text] to beginning");
         System.out.printf(format, "-ae [text]: ", "Add command will add [text] to end");
         System.out.printf(format, "-r [text]: ", "Remove command will remove [text] from files");
@@ -102,7 +116,10 @@ public class Program {
         System.out.printf(format, "-G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
         System.out.printf(format, "-Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
         System.out.printf(format, "-D: ", "Display command will display the metadata of the files");
-        System.out.printf(format, "-dB [dB level]: ", "Normalize command will take a float value in db to normalize files to");
+        System.out.printf(format, "-LN: ", "Loudness Normalize command will make loudness of files similar. \n" +
+                "This will allow user to listen to music without needing to change the volume. Will set loudness to -16 LUFS.");
+        System.out.printf(format, "-LNN [LUFS value]: ", "Loudness Normalize command will take a value in LUFS and bring the loudness of files to that target. \n" +
+                "This will allow user to listen to music without needing to change the volume. Recommended LUFS values are -24 to -14 (numbers closer to 0 are louder).");
         System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
         System.out.printf(format, "-n [path to files]: ", "New command will select new set of files or file to target");
         System.out.printf(format, "-q or q: ", "Quit command will terminate program");
@@ -119,7 +136,7 @@ public class Program {
         // create path obj so the path can be validated
         File file = new File(path);
 
-        // if a valid path isn't entered then re-prompt until it is
+        // check if path is, if not valid then re-prompt until it is
         if (file.isDirectory() || file.isFile()){
             return path;
         }
@@ -133,16 +150,23 @@ public class Program {
             return promptForPath();
         }
     }
-    // prompt for command, returns [command, commandInput] as array
-    //TODO consider command system for adding modifiers for
-    //TODO consider system for adding output files in addition to the input files
+    // prompt for command, returns [command, commandInput, outputPath] as array
     private static String[] promptForCommand(){
         System.out.print("\nEnter command: ");
         String command = input.nextLine();
         String commandInput = "";
+        String outputPath = "";
+
+        // check if user entered output modifier
+        //TODO make sure output same type as path type (file or folder)
+        // check override behavior
+        if (command.contains(" -o ")){
+            outputPath = command.substring(command.indexOf("-o ") + 3);
+            command = command.replace(" -o " + outputPath, "");
+        }
 
         // check if command has an argument
-        if(command.contains(" ")){
+        if (command.contains(" ")){
             // separate command and input
             commandInput = command.substring(command.indexOf(" ") + 1);
             command = command.substring(0, command.indexOf(" "));
@@ -151,7 +175,23 @@ public class Program {
 
         Log.print("command", "<" + command + ">");
         Log.print("command input", "<" + commandInput + ">");
+        Log.print("out path", "<" + outputPath + ">");
 
-        return new String[]{command, commandInput};
+        return new String[]{command, commandInput, outputPath};
+    }
+
+    private static boolean isDouble(String stringVal){
+        boolean valid = false;
+
+        try {
+            Double.parseDouble(stringVal);
+            valid = true;
+        }
+        catch (Exception e) {
+            Log.errorE("Value entered is not a valid number. Try again", e);
+            promptForCommand();
+        }
+
+        return valid;
     }
 }
