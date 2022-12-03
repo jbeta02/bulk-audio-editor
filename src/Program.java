@@ -102,8 +102,9 @@ public class Program {
     private static void displayHelp() {
         String format = "%-30s %s\n";
 
-        //TODO add section about -o (output file path or output folder path)
-        //TODO add -Di (display loudness stats) -n and -q command
+        // TODO complete -DL (display loudness stats), -DA (display by album) -n and -q command
+        System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command");
+        System.out.printf(format, "", "\t\tWill be either folder or file path depending on initial path set");
         System.out.printf(format, "-ab [text]: ", "Add command will add [text] to beginning");
         System.out.printf(format, "-ae [text]: ", "Add command will add [text] to end");
         System.out.printf(format, "-r [text]: ", "Remove command will remove [text] from files");
@@ -112,13 +113,30 @@ public class Program {
         System.out.printf(format, "-G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
         System.out.printf(format, "-Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
         System.out.printf(format, "-D: ", "Display command will display the metadata of the files");
-        System.out.printf(format, "-LN: ", "Loudness Normalize command will make loudness of files similar. \n" +
-                "This will allow user to listen to music without needing to change the volume. Will set loudness to -16 LUFS.");
-        System.out.printf(format, "-LNN [LUFS value]: ", "Loudness Normalize command will take a value in LUFS and bring the loudness of files to that target. \n" +
-                "This will allow user to listen to music without needing to change the volume. Recommended LUFS values are -24 to -14 (numbers closer to 0 are louder).");
+        System.out.printf(format, "-LN: ", "Loudness Normalize command will make loudness of files similar.");
+        System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LUFS.");
+        System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range");
+        System.out.printf(format, "-LNN [LUFS value]: ", "Loudness Normalize command (same as -LN but with custom loudness) will take a value in LUFS and bring the loudness of files to that target.");
+        System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Recommended LUFS values are -24 to -14 (numbers closer to 0 are louder).");
+        System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range\"");
         System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
         System.out.printf(format, "-n [path to files]: ", "New command will select new set of files or file to target");
         System.out.printf(format, "-q or q: ", "Quit command will terminate program");
+        System.out.println();
+
+        System.out.println("Examples------------------------------------");
+        System.out.println("Add command with and without output path modifier");
+        System.out.println("-ab new-");
+        System.out.println("-ab new- -o C:folder1/folder2/");
+        System.out.println("original: file.mp3 >>> after command: new-file.mp3");
+        System.out.println();
+
+        System.out.println("Loudness Normalization command with and without output path modifier");
+        System.out.println("-LN");
+        System.out.println("-LN -o C:folder1/folder2/");
+        System.out.println("Loudness Normalization command with custom loudness with and without output path modifier");
+        System.out.println("-LNN -23");
+        System.out.println("-LNN -o C:folder1/folder2/out-file.mp3");
     }
 
     // recursively prompt for path until a valid path is entered
@@ -142,10 +160,10 @@ public class Program {
             if (path.equals("help")) {
                 displayAbout();
             }
-
             return promptForPath();
         }
     }
+
     // prompt for command, returns [command, commandInput, outputPath] as array
     private static String[] promptForCommand() {
         System.out.print("\nEnter command: ");
