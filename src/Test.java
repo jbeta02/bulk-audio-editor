@@ -10,11 +10,15 @@ public class Test {
 
         //mp3Editor.displayData();
 
-        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-She's Back .mp3\""; //in-She's Back
-        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out1-She's Back .mp3\"";
+//        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-The Reason.mp3\"";
+//        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out23-The Reason.mp3\"";
 
-        //TODO test values with other test files
-        mp3Editor.normalizeVolume(inputFile, outputFile, -14, -5, 11);
+//        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-She's Back.mp3\"";
+//        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out23-She's Back.mp3\"";
+//
+        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-This Fffire.mp3\""; // test-mp3\copy-out-This Fffire.mp3
+        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out23-This Fffire.mp3\"";
 
+        //mp3Editor.normalizeLoudness(inputFile, -23, -2, outputFile); // default: -23, -2, 7 or preferred?: -16, -2, 7
     }
 }
