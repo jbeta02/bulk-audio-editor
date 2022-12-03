@@ -5,14 +5,10 @@ import java.util.Scanner;
 
 public class Program {
 
-    //TODO refactor all code:
-    // change funct(){ to funct() {
-    // change for loop on list (x: y) to (x : y)
-
     private static Scanner input = new Scanner(System.in);
 
     // main method, provide user interface and run commands
-    public static void main(String[] args){ //TODO when Version 1 finished create a releases tag
+    public static void main(String[] args) { //TODO when Version 1 finished create a releases tag on GitHub
         MP3Editor mp3Editor;
         String[] command;
         String path;
@@ -32,8 +28,8 @@ public class Program {
         // prompt for command
         command = promptForCommand(); // command = array [command, commandInput]
 
-        while(!command[0].equals("-q") & !command[0].equals("q")){
-            switch(command[0]){
+        while(!command[0].equals("-q") & !command[0].equals("q")) {
+            switch(command[0]) {
                 case "-ab":
                     mp3Editor.addToFileName(true, command[1]);
                     break;
@@ -71,7 +67,7 @@ public class Program {
                     break;
 
                 case "-LNN":
-                    if (isDouble(command[1])){
+                    if (isDouble(command[1])) {
                         mp3Editor.normalizeFiles(Double.parseDouble(command[1]), command[2]);
                     }
                     break;
@@ -91,7 +87,7 @@ public class Program {
     }
 
     // display a description of Bulk Audio Editor
-    private static void displayAbout(){
+    private static void displayAbout() {
         System.out.print("\n\"Bulk Audio Editor\" is a tool to help edit audio files in bulk. \n" +
                 "A user can enter a path to a folder holding audio files such as mp3 then can run commands that can edit metadata such as: \n" +
                 "- Album\n" +
@@ -103,7 +99,7 @@ public class Program {
     }
 
     // display command options and descriptions
-    private static void displayHelp(){
+    private static void displayHelp() {
         String format = "%-30s %s\n";
 
         //TODO add section about -o (output file path or output folder path)
@@ -126,7 +122,7 @@ public class Program {
     }
 
     // recursively prompt for path until a valid path is entered
-    private static String promptForPath(){
+    private static String promptForPath() {
         String path;
 
         // prompt for path
@@ -137,13 +133,13 @@ public class Program {
         File file = new File(path);
 
         // check if path is, if not valid then re-prompt until it is
-        if (file.isDirectory() || file.isFile()){
+        if (file.isDirectory() || file.isFile()) {
             return path;
         }
         else {
             Log.error("Path not found. Please enter a valid path. Ex: C:\\folder1\\folder2\\");
 
-            if (path.equals("help")){
+            if (path.equals("help")) {
                 displayAbout();
             }
 
@@ -151,7 +147,7 @@ public class Program {
         }
     }
     // prompt for command, returns [command, commandInput, outputPath] as array
-    private static String[] promptForCommand(){
+    private static String[] promptForCommand() {
         System.out.print("\nEnter command: ");
         String command = input.nextLine();
         String commandInput = "";
@@ -160,13 +156,13 @@ public class Program {
         // check if user entered output modifier
         //TODO make sure output same type as path type (file or folder)
         // check override behavior
-        if (command.contains(" -o ")){
+        if (command.contains(" -o ")) {
             outputPath = command.substring(command.indexOf("-o ") + 3);
             command = command.replace(" -o " + outputPath, "");
         }
 
         // check if command has an argument
-        if (command.contains(" ")){
+        if (command.contains(" ")) {
             // separate command and input
             commandInput = command.substring(command.indexOf(" ") + 1);
             command = command.substring(0, command.indexOf(" "));
@@ -180,7 +176,7 @@ public class Program {
         return new String[]{command, commandInput, outputPath};
     }
 
-    private static boolean isDouble(String stringVal){
+    private static boolean isDouble(String stringVal) {
         boolean valid = false;
 
         try {

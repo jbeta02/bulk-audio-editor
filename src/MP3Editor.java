@@ -22,26 +22,25 @@ public class MP3Editor {
     private ArrayList<MP3File> mp3Files = new ArrayList<>();
     private String path = "";
 
-
     // Constructor used to populate mp3Files ArrayList so that it may be used in other methods after instantiation
-    public MP3Editor(String path){
+    public MP3Editor(String path) {
         // set instance variables
         setPath(path);
         setFiles(path);
     }
 
     // add text to either beginning (true) or end (false) of file
-    public void addToFileName(boolean addToStart, String textToAdd){
+    public void addToFileName(boolean addToStart, String textToAdd) {
         String currentName;
         String newName;
 
         // get names
-        for (MP3File file : mp3Files){
+        for (MP3File file : mp3Files) {
             // save the current name
             currentName = file.getFile().getName();
 
             // add text to start of file
-            if (addToStart){
+            if (addToStart) {
                 newName = textToAdd + currentName;
             }
             // TODO add to end of file name doesn't work, it adds text after the extension not end of name
@@ -61,20 +60,19 @@ public class MP3Editor {
             try{
                 Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
-            catch (Exception e){
+            catch (Exception e) {
                 Log.errorE("Failed to save file with new name", e);
             }
-
-            //TODO delete old file when done (complete this after testing thoroughly)
         }
     }
 
-    public void removeFromFileName(String textToRemove){
+    // remove text pattern from file name
+    public void removeFromFileName(String textToRemove) {
         String currentName;
         String newName;
 
         // get names
-        for (MP3File file : mp3Files){
+        for (MP3File file : mp3Files) {
             // save the current name
             currentName = file.getFile().getName();
 
@@ -92,17 +90,15 @@ public class MP3Editor {
             try{
                 Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
             }
-            catch (Exception e){
+            catch (Exception e) {
                 Log.errorE("Failed to save file with new name", e);
             }
-
-            //TODO delete old file when done (complete this after testing thoroughly)
         }
     }
 
     // general algorithm for modifying metadata
-    private void modifySimpleMetadata(FieldKey fieldKey, String text){
-        for (MP3File file : mp3Files){
+    private void modifySimpleMetadata(FieldKey fieldKey, String text) {
+        for (MP3File file : mp3Files) {
             // get tag which contains metadata
             Tag tag = file.getTag();
 
@@ -125,22 +121,23 @@ public class MP3Editor {
     }
 
     // change artist text
-    public void modifyArtist(String artistText){
+    public void modifyArtist(String artistText) {
         modifySimpleMetadata(FieldKey.ARTIST, artistText);
     }
 
     // change album text
-    public void modifyAlbum(String albumText){
+    public void modifyAlbum(String albumText) {
         modifySimpleMetadata(FieldKey.ALBUM, albumText);
     }
 
     // change genre text
-    public void modifyGenre(String genreText){
+    public void modifyGenre(String genreText) {
         modifySimpleMetadata(FieldKey.GENRE, genreText);
     }
 
-    public void changeArt(String pathToArt){
-        for (MP3File file : mp3Files){
+    // change album art
+    public void changeArt(String pathToArt) {
+        for (MP3File file : mp3Files) {
             // get tag which contains metadata
             Tag tag = file.getTag();
 
@@ -154,13 +151,6 @@ public class MP3Editor {
                 // save new cover art
                 file.commit();
 
-                // will create an "AlbumArtSmall.jpg"
-                // will create a "Folder.jpg"
-                // seem to only be visible in IDE
-
-                // files seem to be created when Windows Media Player is opened. Files can be deleted after they are created
-                // without any apparent consequence
-
             } catch (Exception e) {
                 Log.errorE("Unable to set art cover using path: " + pathToArt, e);
             }
@@ -171,7 +161,7 @@ public class MP3Editor {
     public void displayData() {
         // print top data
         // folder name      total files
-        if (mp3Files.size() > 0){
+        if (mp3Files.size() > 0) {
             System.out.printf("%s %-50s %s %s\n\n", "Path:", getPathNoName(mp3Files.get(0).getFile()), "Total File Count:" , mp3Files.size());
         }
         else {
@@ -192,7 +182,7 @@ public class MP3Editor {
 
         // print file data
         // name     artist      album   genre       len
-        for (MP3File file : mp3Files){
+        for (MP3File file : mp3Files) {
             Tag tag = file.getTag();
 
             System.out.printf(format,
@@ -206,39 +196,42 @@ public class MP3Editor {
     }
 
     // display data order by album name
-    public void displayDataAlbum(){
+    public void displayDataAlbum() {
         //TODO work on displayDataAlbum(), might structure this and displayData() so one is the overload of the other
     }
 
     // create folders based on X then put the target files in the corresponding folders where x is
     // metadata such as Album, Artist, Genre
-    public void createFoldersFor(FieldKey sortCriteria){
+    public void createFoldersFor(FieldKey sortCriteria) {
         //TODO work on createFoldersFor()
     }
 
     // normalize mp3 files, ask for integratedLoudness and truePeak
-    public void normalizeFiles(double integratedLoudness, double truePeak, String output){
+    public void normalizeFiles(double integratedLoudness, double truePeak, String output) {
+        // create ffmpgetWrapper obj to run loudness normalization command
         FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
+
         // TODO make progress bar based on curr loop count of total
-        for (MP3File file : mp3Files){
+        // normalize loudness of all target files
+        for (MP3File file : mp3Files) {
             fFmpegWrapper.normalizeLoudness(file.getFile().getPath(), integratedLoudness, truePeak, output);
         }
     }
 
     // overload of normalizeFiles, ask for integratedLoudness
-    public void normalizeFiles(double integratedLoudness, String output){
+    public void normalizeFiles(double integratedLoudness, String output) {
         normalizeFiles(integratedLoudness, FFmpegWrapper.TRUE_PEAK, output);
     }
 
     // overload of normalizeFiles, use default values
-    public void normalizeFiles(String output){
+    public void normalizeFiles(String output) {
         normalizeFiles(FFmpegWrapper.INTEGRATED_LOUDNESS, FFmpegWrapper.TRUE_PEAK, output);
     }
 
     // private utility methods for class ----------------------------------------------
 
     // return file's path but exclude the file from the path string
-    private String getPathNoName(File file){
+    private String getPathNoName(File file) {
         // get current file path
         String currentPath = file.getPath();
 
@@ -250,7 +243,8 @@ public class MP3Editor {
         return newPath;
     }
 
-    private String convertToMinSec(int seconds){
+    // convert seconds min:sec format
+    private String convertToMinSec(int seconds) {
         int min = seconds / 60;
 
         int sec = seconds % 60;
@@ -260,10 +254,12 @@ public class MP3Editor {
 
     // accessors and mutators ----------------------------------------------
 
-    public ArrayList<MP3File> getFiles(){
+    // get file ArrayList
+    public ArrayList<MP3File> getFiles() {
         return mp3Files;
     }
 
+    // populate mp3Files ArrayList
     public void setFiles(String path) {
         File file = new File(path);
 
@@ -312,18 +308,22 @@ public class MP3Editor {
         }
     }
 
-    public String getPath(){
+    //---------------
+
+    // get path
+    public String getPath() {
         return path;
     }
 
-    public void setPath(String path){
+    // set a valid path
+    public void setPath(String path) {
         // check if path is valid
 
         // create path obj so the path can be validated
         File file = new File(path);
 
         // set path if valid
-        if (file.isDirectory() || file.isFile()){
+        if (file.isDirectory() || file.isFile()) {
             this.path = path;
         }
         else {

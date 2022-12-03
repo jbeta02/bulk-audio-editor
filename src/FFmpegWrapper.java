@@ -7,18 +7,18 @@ import java.util.ArrayList;
 
 public class FFmpegWrapper {
 
-    public static final double INTEGRATED_LOUDNESS = -16;
-    public static final double TRUE_PEAK = -2;
-    public static final double LOUDNESS_RANGE = 7;
+    public static final double INTEGRATED_LOUDNESS = -16; // in LUFS
+    public static final double TRUE_PEAK = -2; // in LU
+    public static final double LOUDNESS_RANGE = 7; // in dBTP
 
     private final String FFMPEG = "ffmpeg/bin/ffmpeg.exe";
 
-    private double integratedLoudness;
-    private double truePeak;
+    private double integratedLoudness; // (I) in LUFS
+    private double truePeak; // (TP) in LU
 
-    private double measuredI;
-    private double measuredTp;
-    private double measuredLRA;
+    private double measuredI; // measured integrated loudness
+    private double measuredTp; // measured true peak
+    private double measuredLRA; // measured loudness range
     private double measuredThresh;
     private double offset;
 
@@ -34,14 +34,16 @@ public class FFmpegWrapper {
     // http://ffmpeg.org/ffmpeg-all.html#loudnorm
 
     // implementation of loudness normalization using ffmpeg
-    public void normalizeLoudness(String inputFile, double integrateLoudness, double truePeak, String outputFile){
+    public void normalizeLoudness(String inputFile, double integrateLoudness, double truePeak, String outputFile) {
         try{
-
+            // check that input integratedLoudness and truePeak are valid
             setIntegratedLoudness(integrateLoudness);
             setTruePeak(truePeak);
 
+            // extract loudness stats for future use
             extractLoudnessStats(inputFile);
 
+            // setup ffmpeg command
             String[] passTwo = {"-i", inputFile, "-af",
                     "loudnorm=" +
                             "I=" + integrateLoudness +
@@ -56,20 +58,23 @@ public class FFmpegWrapper {
                             ":print_format=json",
                     "-hide_banner", "-ar", "48k", outputFile}; //TODO add -y modifier to override files if needed
 
-            Log.print("running command (pass two)", FFMPEG + arrayToString(passTwo));
+            // run command and save output to print
             ArrayList<String> commandResult = runFfmpegCommand(passTwo);
+            Log.print("running command (pass two)", FFMPEG + arrayToString(passTwo));
 
-            for (String outputLine: commandResult){
-                Log.print("command output", outputLine);
-            }
+            // print output
+//            for (String outputLine : commandResult) {
+//                Log.print("command output", outputLine);
+//            }
         }
-        catch (Exception e){
+        catch (Exception e) {
             Log.errorE("error running ffmpeg", e);
         }
     }
 
     // get loudness stats of file, use getMeasured---() methods to get values after using this method
-    public void extractLoudnessStats(String inputFile){
+    public void extractLoudnessStats(String inputFile) {
+        // setup ffmpeg command
         String[] passOne = {"-i", inputFile, "-af",
                 "loudnorm=" +
                         "I=" + INTEGRATED_LOUDNESS +
@@ -78,15 +83,19 @@ public class FFmpegWrapper {
                         ":print_format=json",
                 "-hide_banner", "-f", "null", "-"};
 
-        Log.print("running command (pass one)", FFMPEG + arrayToString(passOne));
+        // run command and save output to print
         ArrayList<String> commandResult = runFfmpegCommand(passOne);
+        Log.print("running command (pass one)", FFMPEG + arrayToString(passOne));
 
-        for (String outputLine: commandResult){
-            Log.print("command output", outputLine);
-        }
+        // print output
+//        for (String outputLine : commandResult) {
+//            Log.print("command output", outputLine);
+//        }
 
+        // grab data pairs (key, value)
         ArrayList<Pair<String, Double>> loudnessData = extractDataPairs(commandResult);
 
+        // save values from (key, value) so they can be accessed by outside processes
         measuredI = loudnessData.get(0).getValue();
         measuredTp = loudnessData.get(1).getValue();
         measuredLRA = loudnessData.get(2).getValue();
@@ -96,23 +105,25 @@ public class FFmpegWrapper {
 
     // private utility methods for class ----------------------------------------------
 
-    private ArrayList<Pair<String, Double>> extractDataPairs(ArrayList<String> outputLines){
+    // extract json data pairs from output
+    private ArrayList<Pair<String, Double>> extractDataPairs(ArrayList<String> outputLines) {
         ArrayList<Pair<String, Double>> targetData = new ArrayList<>();
 
-        for (String line : outputLines){
-            if (line.contains("input_i")){
+        // search output lines for desired json values then extract data
+        for (String line : outputLines) {
+            if (line.contains("input_i")) {
                 targetData.add(extractJsonKeyValue(line));
             }
-            if (line.contains("input_tp")){
+            if (line.contains("input_tp")) {
                 targetData.add(extractJsonKeyValue(line));
             }
-            if (line.contains("input_lra")){
+            if (line.contains("input_lra")) {
                 targetData.add(extractJsonKeyValue(line));
             }
-            if (line.contains("input_thresh")){
+            if (line.contains("input_thresh")) {
                 targetData.add(extractJsonKeyValue(line));
             }
-            if (line.contains("target_offset")){
+            if (line.contains("target_offset")) {
                 targetData.add(extractJsonKeyValue(line));
                 break;
             }
@@ -121,7 +132,8 @@ public class FFmpegWrapper {
         return targetData;
     }
 
-    private Pair<String, Double> extractJsonKeyValue(String jsonLine){
+    // grab json key value pair from a json line
+    private Pair<String, Double> extractJsonKeyValue(String jsonLine) {
         jsonLine = jsonLine.replace("\"", "").replace(",", "");
         String[] LineParts = jsonLine.split(":");
 
@@ -133,8 +145,10 @@ public class FFmpegWrapper {
         return new Pair<>(key, value);
     }
 
-    private String arrayToString(String[] stringArray){
+    // convert an array to a string with values separated by a space
+    private String arrayToString(String[] stringArray) {
         String string = "";
+        // separate array values with space
         for (String s : stringArray) {
             string += " " + s;
         }
@@ -143,7 +157,7 @@ public class FFmpegWrapper {
     }
 
     // run an FFmpeg command and collect its output
-    private ArrayList<String> runFfmpegCommand(String[] args){
+    private ArrayList<String> runFfmpegCommand(String[] args) {
         // ArrayList will hold output lines
         ArrayList<String> output = new ArrayList<>();
 
@@ -155,7 +169,7 @@ public class FFmpegWrapper {
             command.add(FFMPEG);
 
             // add the other args
-            for (String arg: args){
+            for (String arg : args) {
                 command.add(arg);
             }
 
@@ -172,7 +186,7 @@ public class FFmpegWrapper {
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
             // collect output
-            for(Object line: reader.lines().toArray()){
+            for(Object line : reader.lines().toArray()) {
                 String stringLine = (String) line;
                 output.add(stringLine);
             }
@@ -180,16 +194,17 @@ public class FFmpegWrapper {
             // close stream since no longer needed
             inputStream.close();
         }
-        catch (Exception e){
+        catch (Exception e) {
             Log.errorE("error running ffmpeg", e);
         }
 
         return output;
     }
 
-    private boolean withinRange(double value, double min, double max){
+    // check if value is within a range
+    private boolean withinRange(double value, double min, double max) {
         boolean inRange = false;
-        if (value < min || value > max){
+        if (value < min || value > max) {
             Log.error("value entered " + value + ", must be between " + min  + " - " + max);
         }
         else {
@@ -206,8 +221,9 @@ public class FFmpegWrapper {
         return integratedLoudness;
     }
 
+    // set a valid integrated loudness
     public void setIntegratedLoudness(double targetInLUFS) {
-        if (!withinRange(targetInLUFS, -70, -5)){
+        if (!withinRange(targetInLUFS, -70, -5)) {
             Log.error("Will set to default integrated loudness to ", INTEGRATED_LOUDNESS + " LUFS");
         }
         else {
@@ -215,13 +231,15 @@ public class FFmpegWrapper {
         }
     }
 
+    //---------------
+
     // won't set a loudness range (LRA) since it would lead to dynamic normalization instead of linear
 //    public double getLoudnessRange() {
 //        return loudnessRange;
 //    }
 //
 //    public void setLoudnessRange(double targetInLU) {
-//        if (withinRange(targetInLU, 1, 50)){
+//        if (withinRange(targetInLU, 1, 50)) {
 //            Log.error("Will set default loudness range to ", LOUDNESS_RANGE + " LU");
 //        }
 //        else {
@@ -229,18 +247,22 @@ public class FFmpegWrapper {
 //        }
 //    }
 
+    //---------------
+
     public double getTruePeak() {
         return truePeak;
     }
 
     public void setTruePeak(double targetInDB) {
-        if (!withinRange(targetInDB, -9, 0)){
+        if (!withinRange(targetInDB, -9, 0)) {
             Log.error("Will set default true peak to ", TRUE_PEAK);
         }
         else {
             truePeak = targetInDB;
         }
     }
+
+    //---------------
 
     // following instance vars are set by ffmpeg so wrapper class does not need to check through mutators
     public double getMeasuredI() {
