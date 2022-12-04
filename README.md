@@ -17,11 +17,5 @@ Current Version: 0.8
 ## Version 2
 
 - Work with other file formats such as flac
-- Cut out blank areas of files (spots with not sound usually at start and end)
-- Search internet for missing metadata of files
-
-## Version 3
-
-- Add GUI mode
 
 #### README will be updated with more details of project and how to use it when version 1 is complete
