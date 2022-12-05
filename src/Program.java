@@ -26,7 +26,7 @@ public class Program {
         mp3Editor = new MP3Editor(path);
 
         // prompt for command
-        command = promptForCommand(); // command = array [command, commandInput]
+        command = promptForCommand(); // command = array [command, commandInput, output path]
 
         while(!command[0].equals("-q") & !command[0].equals("q")) {
             switch(command[0]) {

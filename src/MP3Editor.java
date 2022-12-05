@@ -208,7 +208,7 @@ public class MP3Editor {
 
     // normalize mp3 files, ask for integratedLoudness and truePeak
     public void normalizeFiles(double integratedLoudness, double truePeak, String output) {
-        // create ffmpgetWrapper obj to run loudness normalization command
+        // create ffmpegWrapper obj to run loudness normalization command
         FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
 
         // TODO make progress bar based on curr loop count of total
