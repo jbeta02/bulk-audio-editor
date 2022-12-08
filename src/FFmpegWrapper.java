@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+// Purpose: Make FFmpeg easier to use for MP3Editor and specifically for loudness normalization
+
 public class FFmpegWrapper {
 
     public static final double INTEGRATED_LOUDNESS = -16; // in LUFS
@@ -56,7 +58,7 @@ public class FFmpegWrapper {
                             ":offset=" + offset +
                             ":linear=true" +
                             ":print_format=json",
-                    "-hide_banner", "-ar", "48k", outputFile}; //TODO add -y modifier to override files if needed
+                    "-hide_banner", "-y", "-ar", "48k", outputFile};
 
             // run command and save output to print
             ArrayList<String> commandResult = runFfmpegCommand(passTwo);
