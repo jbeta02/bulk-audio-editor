@@ -26,36 +26,56 @@ public class Program {
         mp3Editor = new MP3Editor(path);
 
         // prompt for command
-        command = promptForCommand(); // command = array [command, commandInput, output path]
+        command = promptForCommand(mp3Editor.getInputPath()); // command = array [command, commandInput, output path]
+
+        // check for valid output path then check if there are file conflicts
+        if (!command[2].equals("")) {
+            // first check output
+            boolean isValidOutput = FileHandler.isPathLogical(
+                    FileHandler.isFolder(path),
+                    FileHandler.isFolder(command[2])
+            );
+            if (!isValidOutput) {
+                // prompt for command
+                Log.print("Re-enter command");
+                command = promptForCommand(mp3Editor.getInputPath());
+            }
+            // if output valid then check file conflicts
+            else {
+                // check if there are name conflicts
+                // (if conflicts exist ask if overriding ok, if override not ok then skip file)
+                mp3Editor.skipOverrideDenials(command[2]);
+            }
+        }
 
         while(!command[0].equals("-q") & !command[0].equals("q")) {
             switch(command[0]) {
                 case "-ab":
-                    mp3Editor.addToFileName(true, command[1]);
+                    mp3Editor.addToFileName(true, command[1], command[2]);
                     break;
 
                 case "-ae":
-                    mp3Editor.addToFileName(false, command[1]);
+                    mp3Editor.addToFileName(false, command[1], command[2]);
                     break;
 
                 case "-r":
-                    mp3Editor.removeFromFileName(command[1]);
+                    mp3Editor.removeFromFileName(command[1], command[2]);
                     break;
 
                 case "-Ar":
-                    mp3Editor.modifyArtist(command[1]);
+                    mp3Editor.modifyArtist(command[1], command[2]);
                     break;
 
                 case "-A":
-                    mp3Editor.modifyAlbum(command[1]);
+                    mp3Editor.modifyAlbum(command[1], command[2]);
                     break;
 
                 case "-G":
-                    mp3Editor.modifyGenre(command[1]);
+                    mp3Editor.modifyGenre(command[1], command[2]);
                     break;
 
                 case "-Art":
-                    mp3Editor.changeArt(command[1]);
+                    mp3Editor.changeArt(command[1], command[2]);
                     break;
 
                 case "-D":
@@ -67,9 +87,7 @@ public class Program {
                     break;
 
                 case "-LNN":
-                    if (isDouble(command[1])) {
-                        mp3Editor.normalizeFiles(Double.parseDouble(command[1]), command[2]);
-                    }
+                    mp3Editor.normalizeFiles(toDouble(command[1]), command[2]);
                     break;
 
                 case "-h":
@@ -77,12 +95,13 @@ public class Program {
                     break;
 
                 default:
+                    //TODO don't switch target path unless command runs successfully or a valid command is actually ran
                     System.out.println("\nPlease enter a valid command. Below is a list of all commands.");
                     System.out.println("(List of commands can be produced again using \"-h\" command)\n");
                     displayHelp();
                     break;
             }
-            command = promptForCommand();
+            command = promptForCommand(mp3Editor.getInputPath());
         }
     }
 
@@ -165,15 +184,14 @@ public class Program {
     }
 
     // prompt for command, returns [command, commandInput, outputPath] as array
-    private static String[] promptForCommand() {
+    private static String[] promptForCommand(String currInputPath) {
+        System.out.println("\nCurrent target path: " + currInputPath);
         System.out.print("\nEnter command: ");
         String command = input.nextLine();
         String commandInput = "";
         String outputPath = "";
 
         // check if user entered output modifier
-        //TODO make sure output same type as path type (file or folder)
-        // check override behavior
         if (command.contains(" -o ")) {
             outputPath = command.substring(command.indexOf("-o ") + 3);
             command = command.replace(" -o " + outputPath, "");
@@ -194,18 +212,17 @@ public class Program {
         return new String[]{command, commandInput, outputPath};
     }
 
-    private static boolean isDouble(String stringVal) {
-        boolean valid = false;
+    private static double toDouble(String stringVal) {
+        double value = 0;
 
         try {
-            Double.parseDouble(stringVal);
-            valid = true;
+            value = Double.parseDouble(stringVal);
         }
         catch (Exception e) {
             Log.errorE("Value entered is not a valid number. Try again", e);
-            promptForCommand();
+            promptForCommand("");
         }
 
-        return valid;
+        return value;
     }
 }
