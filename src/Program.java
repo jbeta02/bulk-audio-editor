@@ -28,6 +28,8 @@ public class Program {
         // prompt for command
         command = promptForCommand(mp3Editor.getInputPath()); // command = array [command, commandInput, output path]
 
+        //TODO trim output path
+
         // check for valid output path then check if there are file conflicts
         if (!command[2].equals("")) {
             // first check output
@@ -95,7 +97,6 @@ public class Program {
                     break;
 
                 default:
-                    //TODO don't switch target path unless command runs successfully or a valid command is actually ran
                     System.out.println("\nPlease enter a valid command. Below is a list of all commands.");
                     System.out.println("(List of commands can be produced again using \"-h\" command)\n");
                     displayHelp();

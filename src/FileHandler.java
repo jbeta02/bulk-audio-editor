@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Scanner;
 
 // Purpose: Utility functions for actions relating to file interactions
 
@@ -37,7 +38,7 @@ public class FileHandler {
         if (isFolder(outputPath)) {
             newFilePath = Paths.get(outputPath, inputFile.getName());
         }
-        // if out path is file then we don't need to add the name to path again
+        // if out path is file then we don't need to add the file name to path again
         else {
             newFilePath = Paths.get(outputPath);
         }
@@ -61,22 +62,35 @@ public class FileHandler {
     public static boolean isOverrideAllowed(String outputFileName, String outputPath) {
         // check if output already exists
         // if yes, prompt if override desired > if yes then finish, if no then stop
-        //TODO create real prompt
+        boolean isAllowed = true;
         if (nameAlreadyExists(outputFileName, outputPath)) {
+
+            Scanner input = new Scanner(System.in);
+
             System.out.println("file " + outputFileName + " already exists in " + outputPath + ". Do you want to override existing file?");
-            System.out.println("enter y or n: ");
-            System.out.println("---------------make this a real prompt---------------------");
-            return false;
+            System.out.print("Enter y or n: ");
+
+            switch (input.nextLine()){
+                case "y":
+                    isAllowed = true;
+                    break;
+                case "n":
+                    isAllowed = false;
+                    break;
+                default:
+                    System.out.println("Enter y or n. Will prompt again.");
+                    isAllowed = isOverrideAllowed(outputFileName, outputPath);
+                    break;
+            }
         }
-        return true;
+        return isAllowed;
     }
 
-    // check if file with x name already exists
+    // check if file with x name already exists in given path
     // (shorthand way of checking if 2 files are equal without looking at their contents)
     public static boolean nameAlreadyExists(String outputFileName, String outputPath) {
         boolean alreadyExists = false;
         File outPathAsFile = new File(outputPath);
-        Log.print("out file name", outPathAsFile.getName());
 
         if (outPathAsFile.isDirectory()){
             for (File file :outPathAsFile.listFiles()) {

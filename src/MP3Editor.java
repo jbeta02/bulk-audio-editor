@@ -22,6 +22,8 @@ public class MP3Editor {
     private ArrayList<MP3File> mp3Files = new ArrayList<>();
     private String inputPath = "";
 
+    private ArrayList<MP3File> mp3FilesNoOverride = new ArrayList<>();
+
     private final String TEMP_FOLDER = "temp/";
 
     // Constructor used to populate mp3Files ArrayList so that it may be used in other methods after instantiation
@@ -291,10 +293,12 @@ public class MP3Editor {
         for (int i = 0; i < mp3Files.size(); i++){
             // if conflict found and override not allowed then remove file from list
             if (!FileHandler.isOverrideAllowed(mp3Files.get(i).getFile().getName(), outputPath)) {
+                mp3FilesNoOverride.add(mp3Files.get(i));
                 mp3Files.remove(i);
                 i = i - 1;
             }
         }
+        Log.print("mp3 files after asking for override ", mp3Files);
     }
 
     // private utility methods for class ----------------------------------------------
@@ -306,8 +310,28 @@ public class MP3Editor {
                 FileHandler.copyFile(mp3File.getFile(), outputPath);
             }
             // set new target path since work will likely be done to new files instead of old ones
+            setOutputToInput(outputPath);
+        }
+    }
+
+    // set output to input and ignore no override files
+    private void setOutputToInput(String outputPath) {
+        if (!outputPath.equals("")) {
+            // set new target path since work will likely be done to new files instead of old ones
             setInputPath(outputPath);
             setFiles(outputPath);
+
+            // from new mp3 files remove noOverride files be checking is names correspond
+            if (mp3FilesNoOverride.size() > 0) {
+                for (int i = 0; i < mp3Files.size(); i++) {
+
+                    for (int j = 0; j < mp3FilesNoOverride.size(); j++) {
+                        if (FileHandler.nameAlreadyExists(mp3Files.get(i).getFile().getName(), mp3FilesNoOverride.get(j).getFile().getPath())) {
+                            mp3Files.remove(i);
+                        }
+                    }
+                }
+            }
             Log.print("Target path CHANGED to", inputPath);
         }
     }
