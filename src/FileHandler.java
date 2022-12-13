@@ -6,8 +6,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Scanner;
 
 // Purpose: Utility functions for actions relating to file interactions
-
-//TODO replace all instances of File methods with FileHandler methods instead
 public class FileHandler {
 
     // handle input/output paths ----------------------------------------------
@@ -146,6 +144,7 @@ public class FileHandler {
         return newPath;
     }
 
+    // return file's path but exclude the file from the path string
     public static String getPathNoName(String path) {
         // get current file path
         String currPath = getFile(path).getPath();

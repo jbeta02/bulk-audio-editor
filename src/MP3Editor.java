@@ -3,7 +3,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.text.Collator;
 import java.util.*;
 
 // jaudiotagger is an external library for manipulating mp3 files
@@ -60,7 +59,7 @@ public class MP3Editor {
             // get file properties from mp3 obj then get path
             Path oldFilePath = Paths.get(file.getFile().getPath());
             // get file properties from mp3 obj then get path without a file name, add newName as file
-            Path newFilePath = Paths.get(getPathNoName(file.getFile()), newName);
+            Path newFilePath = Paths.get(FileHandler.getPathNoName(file.getFile()), newName);
 
             Log.print("old name", currentName);
             Log.print("new name", newName);
@@ -101,7 +100,7 @@ public class MP3Editor {
             // get file properties from mp3 obj then get path
             Path oldFilePath = Paths.get(file.getFile().getPath());
             // get file properties from mp3 obj then get path without a file name, add newName as file
-            Path newFilePath = Paths.get(getPathNoName(file.getFile()), newName);
+            Path newFilePath = Paths.get(FileHandler.getPathNoName(file.getFile()), newName);
 
             Log.print("old name", currentName);
             Log.print("new name", newName);
@@ -191,7 +190,57 @@ public class MP3Editor {
         }
     }
 
-    // display data order by album name
+    // display files sorted by name
+    public void displayDataByName() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using the file name
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getFile().getName());
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by album name
+    public void displayDataByAlbum() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using album name
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.ALBUM));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by artist name
+    public void displayDataByArtist() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using given artist name
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.ARTIST));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by genre
+    public void displayDataByGenre() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using the genre
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.GENRE));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by genre
+    public void displayDataByLoudness() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using loudness
+        Comparator<LoudnessFile> sortByCriteria = Comparator.comparing(LoudnessFile -> LoudnessFile.getMeasuredI());
+
+        // sort and display
+        displayDataByLoudness(sortByCriteria.reversed());
+    }
+
+    // display data order by given criteria
     private void displayDataBy(Comparator<MP3File> sortByCriteria) {
         ArrayList<MP3File> mp3FilesSorted = new ArrayList<>();
 
@@ -207,59 +256,36 @@ public class MP3Editor {
         displayData(mp3FilesSorted);
     }
 
-    // display files sorted by name order
-    public void displayDataByName() {
-        // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using the file name
-        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getFile().getName());
+    // display data order by given criteria using loudnessFile
+    private void displayDataByLoudness(Comparator<LoudnessFile> sortByCriteria) {
+        ArrayList<LoudnessFile> mp3FilesSorted = new ArrayList<>();
 
-        // sort and display
-        displayDataBy(sortByCriteria);
+        // convert files in mp3Files to LoudnessFile then copy list of mp3Files to mp3FilesSorted
+        for (MP3File file : mp3Files) {
+            LoudnessFile loudnessFile = new LoudnessFile(file);
+            mp3FilesSorted.add(loudnessFile);
+        }
+
+        // sort list
+        mp3FilesSorted.sort(sortByCriteria);
+
+        // display sorted data
+        displayDataWithLoudness(mp3FilesSorted);
     }
 
-    // display files sorted by album name order
-    public void displayDataByAlbum() {
-        // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using album name
-        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.ALBUM));
-
-        // sort and display
-        displayDataBy(sortByCriteria);
-    }
-
-    // display files sorted by artist name order
-    public void displayDataByArtist() {
-        // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using given artist name
-        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.ARTIST));
-
-        // sort and display
-        displayDataBy(sortByCriteria);
-    }
-
-    // display files sorted by genre order
-    public void displayDataByGenre() {
-        // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using the genre
-        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.GENRE));
-
-        // sort and display
-        displayDataBy(sortByCriteria);
-    }
-
-    // display data of all audio files in folder (order by name)
-    private void displayData(ArrayList<MP3File> mp3Files) {
+    // display data of all audio files in folder
+    public void displayData(ArrayList<MP3File> mp3Files) {
         // print top data
         // folder name      total files
         if (mp3Files.size() > 0) {
-            System.out.printf("%s %-50s %s %s\n\n", "Path:", getPathNoName(mp3Files.get(0).getFile()), "Total File Count:" , mp3Files.size());
+            System.out.printf("%s %-50s %s %s\n\n", "Path:", FileHandler.getPathNoName(mp3Files.get(0).getFile()), "Total File Count:" , mp3Files.size());
         }
         else {
             System.out.println("No files in folder");
         }
 
         // format for file data
-        String format = "%-50s %-30s %-30s %-30s %-30s\n";
+        String format = "%-50s %-30s %-30s %-20s %-15s\n";
 
         // print header
         System.out.printf(format,
@@ -268,6 +294,14 @@ public class MP3Editor {
                 "Artist",
                 "Genre",
                 "Length"
+        );
+        // print bottom of each header piece
+        System.out.printf(format,
+                "--------",
+                "--------",
+                "--------",
+                "--------",
+                "------"
         );
 
         // print file data
@@ -281,6 +315,61 @@ public class MP3Editor {
                     tag.getFirst(FieldKey.ARTIST),
                     tag.getFirst(FieldKey.GENRE),
                     convertToMinSec(file.getAudioHeader().getTrackLength())
+            );
+        }
+    }
+
+    // display data of all audio files in folder including loudness stats
+    public void displayDataWithLoudness(ArrayList<LoudnessFile> loudnessFilesFiles) {
+        // print top data
+        // folder name      total files
+        if (loudnessFilesFiles.size() > 0) {
+            System.out.printf("%s %-50s %s %s\n\n", "Path:", FileHandler.getPathNoName(loudnessFilesFiles.get(0).getMp3File().getFile()), "Total File Count:" , loudnessFilesFiles.size());
+        }
+        else {
+            System.out.println("No files in folder");
+        }
+
+        // format for file data
+        String format = "%-50s %-30s %-30s %-20s %-15s %-30s %-20s %-20s\n";
+
+        // print header
+        System.out.printf(format,
+                "Name",
+                "Album",
+                "Artist",
+                "Genre",
+                "Length",
+                "Integrated Loudness [LU]",
+                "True Peak [dBFS]",
+                "Loudness Range (LUFS)"
+        );
+        // print bottom of each header piece
+        System.out.printf(format,
+                "--------",
+                "--------",
+                "--------",
+                "--------",
+                "------",
+                "--------",
+                "-----",
+                "------"
+        );
+
+        // print file data
+        // name     artist      album   genre       len
+        for (LoudnessFile file : loudnessFilesFiles) {
+            Tag tag = file.getMp3File().getTag();
+
+            System.out.printf(format,
+                    file.getMp3File().getFile().getName(),
+                    tag.getFirst(FieldKey.ALBUM),
+                    tag.getFirst(FieldKey.ARTIST),
+                    tag.getFirst(FieldKey.GENRE),
+                    convertToMinSec(file.getMp3File().getAudioHeader().getTrackLength()),
+                    file.getMeasuredI(), // integrated loudness
+                    file.getMeasuredTp(), // true peak
+                    file.getMeasuredLRA() // loudness range
             );
         }
     }
@@ -386,19 +475,6 @@ public class MP3Editor {
             }
             Log.print("Target path CHANGED to", inputPath);
         }
-    }
-
-    // return file's path but exclude the file from the path string
-    private String getPathNoName(File file) {
-        // get current file path
-        String currentPath = file.getPath();
-
-        // remove current file name from path
-        // (will remove file name and extension)
-        // create new string starting from beginning of path and ending at \ (inclusive)
-        String newPath = currentPath.substring(0, currentPath.lastIndexOf("\\") + 1);
-
-        return newPath;
     }
 
     // convert seconds min:sec format
