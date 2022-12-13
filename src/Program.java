@@ -1,5 +1,7 @@
 // Purpose: Main program class, prompt for and run commands
 
+import org.jaudiotagger.tag.FieldKey;
+
 import java.io.File;
 import java.util.Scanner;
 
@@ -80,8 +82,20 @@ public class Program {
                     mp3Editor.changeArt(command[1], command[2]);
                     break;
 
-                case "-D":
-                    mp3Editor.displayData();
+                case "-DN":
+                    mp3Editor.displayDataByName();
+                    break;
+
+                case "-DAr":
+                    mp3Editor.displayDataByArtist();
+                    break;
+
+                case "-DA":
+                    mp3Editor.displayDataByAlbum();
+                    break;
+
+                case "-DG":
+                    mp3Editor.displayDataByGenre();
                     break;
 
                 case "-LN":
@@ -90,6 +104,11 @@ public class Program {
 
                 case "-LNN":
                     mp3Editor.normalizeFiles(toDouble(command[1]), command[2]);
+                    break;
+
+                case "-n":
+                    mp3Editor.setInputPath(command[1]);
+                    mp3Editor.setFiles(command[1]);
                     break;
 
                 case "-h":
@@ -104,6 +123,8 @@ public class Program {
             }
             command = promptForCommand(mp3Editor.getInputPath());
         }
+
+        System.out.println("\nClosing Program...");
     }
 
     // display a description of Bulk Audio Editor
@@ -122,7 +143,8 @@ public class Program {
     private static void displayHelp() {
         String format = "%-30s %s\n";
 
-        // TODO complete -DL (display loudness stats), -DA (display by album) -n and -q command
+        // TODO continue here: complete all remaining commands
+        // TODO complete -DL (display loudness stats)
         System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command");
         System.out.printf(format, "", "\t\tWill be either folder or file path depending on initial path set");
         System.out.printf(format, "-ab [text]: ", "Add command will add [text] to beginning");
@@ -132,15 +154,18 @@ public class Program {
         System.out.printf(format, "-A [album text]: ", "Album command will add [album text] to album metadata of files");
         System.out.printf(format, "-G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
         System.out.printf(format, "-Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
-        System.out.printf(format, "-D: ", "Display command will display the metadata of the files");
+        System.out.printf(format, "-DN: ", "Display command will display the metadata of the files organized by name");
+        System.out.printf(format, "-DAr: ", "Display command will display the metadata of the files organized by artist name");
+        System.out.printf(format, "-DA: ", "Display command will display the metadata of the files organized by album");
+        System.out.printf(format, "-DG: ", "Display command will display the metadata of the files organized by genre");
         System.out.printf(format, "-LN: ", "Loudness Normalize command will make loudness of files similar.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LUFS.");
         System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range");
         System.out.printf(format, "-LNN [LUFS value]: ", "Loudness Normalize command (same as -LN but with custom loudness) will take a value in LUFS and bring the loudness of files to that target.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Recommended LUFS values are -24 to -14 (numbers closer to 0 are louder).");
         System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range\"");
-        System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
         System.out.printf(format, "-n [path to files]: ", "New command will select new set of files or file to target");
+        System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
         System.out.printf(format, "-q or q: ", "Quit command will terminate program");
         System.out.println();
 

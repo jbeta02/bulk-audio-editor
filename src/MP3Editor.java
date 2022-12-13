@@ -3,7 +3,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.ArrayList;
+import java.text.Collator;
+import java.util.*;
 
 // jaudiotagger is an external library for manipulating mp3 files
 import org.jaudiotagger.audio.AudioFileIO;
@@ -190,8 +191,64 @@ public class MP3Editor {
         }
     }
 
+    // display data order by album name
+    private void displayDataBy(Comparator<MP3File> sortByCriteria) {
+        ArrayList<MP3File> mp3FilesSorted = new ArrayList<>();
+
+        // copy contents of mp3Files to mp3FilesSorted
+        for (MP3File file : mp3Files) {
+            mp3FilesSorted.add(file);
+        }
+
+        // sort list
+        mp3FilesSorted.sort(sortByCriteria);
+
+        // display sorted data
+        displayData(mp3FilesSorted);
+    }
+
+    // display files sorted by name order
+    public void displayDataByName() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using the file name
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getFile().getName());
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by album name order
+    public void displayDataByAlbum() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using album name
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.ALBUM));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by artist name order
+    public void displayDataByArtist() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using given artist name
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.ARTIST));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by genre order
+    public void displayDataByGenre() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using the genre
+        Comparator<MP3File> sortByCriteria = Comparator.comparing(MP3File -> MP3File.getTag().getFirst(FieldKey.GENRE));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
     // display data of all audio files in folder (order by name)
-    public void displayData() {
+    private void displayData(ArrayList<MP3File> mp3Files) {
         // print top data
         // folder name      total files
         if (mp3Files.size() > 0) {
@@ -226,11 +283,6 @@ public class MP3Editor {
                     convertToMinSec(file.getAudioHeader().getTrackLength())
             );
         }
-    }
-
-    // display data order by album name
-    public void displayDataAlbum() {
-        //TODO work on displayDataAlbum(), might structure this and displayData() so one is the overload of the other
     }
 
     // create folders based on X then put the target files in the corresponding folders where x is
