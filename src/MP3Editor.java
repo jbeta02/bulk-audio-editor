@@ -248,7 +248,6 @@ public class MP3Editor {
         for (MP3File file : mp3Files) {
             mp3FilesSorted.add(file);
         }
-
         // sort list
         mp3FilesSorted.sort(sortByCriteria);
 
@@ -261,9 +260,12 @@ public class MP3Editor {
         ArrayList<LoudnessFile> mp3FilesSorted = new ArrayList<>();
 
         // convert files in mp3Files to LoudnessFile then copy list of mp3Files to mp3FilesSorted
-        for (MP3File file : mp3Files) {
-            LoudnessFile loudnessFile = new LoudnessFile(file);
+        for (int i = 0; i < mp3Files.size(); i++) {
+            LoudnessFile loudnessFile = new LoudnessFile(mp3Files.get(i));
             mp3FilesSorted.add(loudnessFile);
+
+            // create progress bar
+            UserFeedback.progressBar("Progress Getting Loudness Data", i + 1, mp3Files.size());
         }
 
         // sort list
@@ -392,15 +394,18 @@ public class MP3Editor {
             usingTemp = true;
         }
 
-        // TODO make progress bar based on curr loop count of total
         // normalize loudness of all target files
-        for (MP3File file : mp3Files) {
+        for (int i = 0; i < mp3Files.size(); i++) {
             // if outputPath is a folder then will need to change to file specific path for ffmpeg
             if (FileHandler.isFolder(outputPath)) {
                 // add name to curr file to path
-                outputPath = FileHandler.createPath(outputPath, file.getFile().getName());
+                outputPath = FileHandler.createPath(outputPath, mp3Files.get(i).getFile().getName());
             }
-            fFmpegWrapper.normalizeLoudness(file.getFile().getPath(), integratedLoudness, truePeak, outputPath);
+            // run ffmpeg normalization command
+            fFmpegWrapper.normalizeLoudness(mp3Files.get(i).getFile().getPath(), integratedLoudness, truePeak, outputPath);
+
+            // create progress bar
+            UserFeedback.progressBar("Progress Getting Loudness Data", i + 1, mp3Files.size());
         }
 
         // (not needed if an output path is specified

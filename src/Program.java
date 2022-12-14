@@ -147,8 +147,7 @@ public class Program {
     private static void displayHelp() {
         String format = "%-30s %s\n";
 
-        // TODO continue here: complete all remaining commands
-        // TODO complete -DL (display loudness stats), consider removing "-" from all commands so it is one less character to type
+        // TODO consider removing "-" from all commands so it is one less character to type
         System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command");
         System.out.printf(format, "", "\t\tWill be either folder or file path depending on initial path set");
         System.out.printf(format, "-ab [text]: ", "Add command will add [text] to beginning");
@@ -162,7 +161,7 @@ public class Program {
         System.out.printf(format, "-DAr: ", "Display by artist command will display the metadata of the files organized by artist name");
         System.out.printf(format, "-DA: ", "Display by album command will display the metadata of the files organized by album");
         System.out.printf(format, "-DG: ", "Display by genre command will display the metadata of the files organized by genre");
-        System.out.printf(format, "-DL: ", "Display by loudness command will display the metadata and loudness stats of the files organized by loudest to quietest");
+        System.out.printf(format, "-DL: ", "Display by loudness command will display the metadata and loudness data of the files organized by loudest to quietest in LU");
         System.out.printf(format, "-LN: ", "Loudness Normalize command will make loudness of files similar.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LUFS.");
         System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range");
