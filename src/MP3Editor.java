@@ -50,10 +50,14 @@ public class MP3Editor {
             if (addToStart) {
                 newName = textToAdd + currentName;
             }
-            // TODO add to end of file name doesn't work, it adds text after the extension not end of name
-            // add text to end of file
             else {
-                newName = currentName + textToAdd;
+                // get extension to add to end of new name
+                String extension = currentName.substring(currentName.lastIndexOf("."));
+                // remove extension from current name new text can be added to end of name
+                currentName = currentName.replace(extension, "");
+
+                // create new name with text added to end
+                newName = currentName + textToAdd + extension;
             }
 
             // get file properties from mp3 obj then get path
