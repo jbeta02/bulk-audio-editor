@@ -1,4 +1,5 @@
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -280,7 +281,7 @@ public class MP3Editor {
     }
 
     // display data of all audio files in folder
-    public void displayData(ArrayList<MP3File> mp3Files) {
+    private void displayData(ArrayList<MP3File> mp3Files) {
         // print top data
         // folder name      total files
         if (mp3Files.size() > 0) {
@@ -380,10 +381,87 @@ public class MP3Editor {
         }
     }
 
+    // create folder based on files artist
+    public void createFoldersByArtist(String outputPath) {
+        createFoldersFor(FieldKey.ARTIST, outputPath);
+    }
+
+    // create folder based on files album
+    public void createFoldersByAlbum(String outputPath) {
+        createFoldersFor(FieldKey.ALBUM, outputPath);
+    }
+
     // create folders based on X then put the target files in the corresponding folders where x is
     // metadata such as Album, Artist, Genre
-    public void createFoldersFor(FieldKey sortCriteria) {
-        //TODO work on createFoldersFor()
+    private void createFoldersFor(FieldKey fieldKey, String outputPath) {
+        ArrayList<File> folders;
+
+        // use output as input if user wants to keep work input folder
+        if (outputPath.equals("")) {
+            outputPath = inputPath;
+        }
+
+        // check if output is folder
+        if (FileHandler.isFolder(outputPath)) {
+            // save folders already present
+            folders = FileHandler.getFolders(outputPath);
+
+            // place files in appropriate folders
+            for (MP3File file : mp3Files) {
+                boolean nameConflict = false;
+                Tag tag = file.getTag();
+
+                Log.print("number of folders in output", folders.size());
+
+                // check if folder name conflicts exist, if so then check if folder contains file name conflicts,
+                //      if so ask then ask if override ok
+                for (File folder : folders) {
+                    // check if folder name conflicts exist
+                    if (tag.getFirst(fieldKey).contains(folder.getName())) {
+
+                        // check if name conflicts
+                        if (FileHandler.isOverrideAllowed(file.getFile().getName(), folder.toString())) {
+                            // add files to new folder
+                            FileHandler.copyFile(file.getFile(), (folder.toString()));
+                        }
+                        nameConflict = true;
+                    }
+                }
+
+                // if no other folders with possible name conflicts exist then new create folder and place files inside
+                if (!nameConflict) {
+                    try {
+                        // create folder and add to list of folders
+                        Path createdFolder = Paths.get(outputPath, tag.getFirst(fieldKey));
+                        Files.createDirectory(createdFolder);
+                        folders.add(createdFolder.toFile());
+
+                        // check if name conflicts
+                        if (FileHandler.isOverrideAllowed(file.getFile().getName(), createdFolder.toString())) {
+                            // add files to new folder
+                            FileHandler.copyFile(file.getFile(), (createdFolder.toString()));
+                        }
+                    }
+                    catch (Exception e) {
+                        Log.errorE("Unable to create new folder", e);
+                    }
+                }
+
+                // delete old file (not inside folder) if work being done inside input folder
+                if (outputPath.equals("")) {
+                    try {
+                        Files.delete(file.getFile().toPath());
+                    }
+                    catch (IOException e) {
+                        Log.errorE("Unable to remove copy of " + file.getFile().getName() + " not in folder", e);
+                    }
+                }
+            }
+        }
+
+        else {
+            Log.print("To use this command output path must be a folder.");
+        }
     }
 
     // normalize mp3 files, ask for integratedLoudness and truePeak
@@ -448,11 +526,11 @@ public class MP3Editor {
                 i = i - 1;
             }
         }
-        Log.print("mp3 files after asking for override ", mp3Files);
     }
 
     // private utility methods for class ----------------------------------------------
 
+    // copy mp3 files to a set output path
     private void copyFilesToOutput(String outputPath) {
         if (!outputPath.equals("")) {
             // loop through files and move to new location
@@ -486,7 +564,7 @@ public class MP3Editor {
         }
     }
 
-    // convert seconds min:sec format
+    // convert seconds to min:sec format
     private String convertToMinSec(int seconds) {
         int min = seconds / 60;
 

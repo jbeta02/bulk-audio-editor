@@ -46,9 +46,13 @@ public class Program {
             }
             // if output valid then check file conflicts
             else {
-                // check if there are name conflicts
-                // (if conflicts exist ask if overriding ok, if override not ok then skip file)
-                mp3Editor.skipOverrideDenials(command[2]);
+
+                // -a command handles name conflicts internally
+                if (!command[0].equals("-a")){
+                    // check if there are name conflicts
+                    // (if conflicts exist ask if overriding ok, if override not ok then skip file)
+                    mp3Editor.skipOverrideDenials(command[2]);
+                }
             }
         }
 
@@ -82,6 +86,24 @@ public class Program {
                     mp3Editor.changeArt(command[1], command[2]);
                     break;
 
+                // normalize using default value of -16 LU
+                case "-LN":
+                    mp3Editor.normalizeFiles(command[2]);
+                    break;
+
+                // normalize with custom loudness
+                case "-LNN":
+                    mp3Editor.normalizeFiles(toDouble(command[1]), command[2]);
+                    break;
+
+                case "-cffAr":
+                    mp3Editor.createFoldersByArtist(command[2]);
+                    break;
+
+                case "-cffA":
+                    mp3Editor.createFoldersByAlbum(command[2]);
+                    break;
+
                 case "-DN":
                     mp3Editor.displayDataByName();
                     break;
@@ -100,14 +122,6 @@ public class Program {
 
                 case "-DL":
                     mp3Editor.displayDataByLoudness();
-                    break;
-
-                case "-LN":
-                    mp3Editor.normalizeFiles(command[2]);
-                    break;
-
-                case "-LNN":
-                    mp3Editor.normalizeFiles(toDouble(command[1]), command[2]);
                     break;
 
                 case "-n":
@@ -147,7 +161,7 @@ public class Program {
     private static void displayHelp() {
         String format = "%-30s %s\n";
 
-        // TODO consider removing "-" from all commands so it is one less character to type
+        //TODO consider removing "-" from all commands so it is one less character to type
         System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command");
         System.out.printf(format, "", "\t\tWill be either folder or file path depending on initial path set");
         System.out.printf(format, "-ab [text]: ", "Add command will add [text] to beginning");
@@ -157,17 +171,19 @@ public class Program {
         System.out.printf(format, "-A [album text]: ", "Album command will add [album text] to album metadata of files");
         System.out.printf(format, "-G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
         System.out.printf(format, "-Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
-        System.out.printf(format, "-DN: ", "Display by name command will display the metadata of the files organized by name");
-        System.out.printf(format, "-DAr: ", "Display by artist command will display the metadata of the files organized by artist name");
-        System.out.printf(format, "-DA: ", "Display by album command will display the metadata of the files organized by album");
-        System.out.printf(format, "-DG: ", "Display by genre command will display the metadata of the files organized by genre");
-        System.out.printf(format, "-DL: ", "Display by loudness command will display the metadata and loudness data of the files organized by loudest to quietest in LU");
         System.out.printf(format, "-LN: ", "Loudness Normalize command will make loudness of files similar.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LUFS.");
         System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range");
         System.out.printf(format, "-LNN [LUFS value]: ", "Loudness Normalize command (same as -LN but with custom loudness) will take a value in LUFS and bring the loudness of files to that target.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Recommended LUFS values are -24 to -14 (numbers closer to 0 are louder).");
         System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range\"");
+        System.out.printf(format, "-cffA: ", "Create folders for album will create folder for files based on their album then put the files in those folders");
+        System.out.printf(format, "-cffAr: ", "Create folders for artist will create folder for files based on their artist then put the files in those folders");
+        System.out.printf(format, "-DN: ", "Display by name command will display the metadata of the files organized by name");
+        System.out.printf(format, "-DAr: ", "Display by artist command will display the metadata of the files organized by artist name");
+        System.out.printf(format, "-DA: ", "Display by album command will display the metadata of the files organized by album");
+        System.out.printf(format, "-DG: ", "Display by genre command will display the metadata of the files organized by genre");
+        System.out.printf(format, "-DL: ", "Display by loudness command will display the metadata and loudness data of the files organized by loudest to quietest in LU");
         System.out.printf(format, "-n [path to files]: ", "New command will select new set of files or file to target");
         System.out.printf(format, "-h or help: ", "Help command will display all command options and give their descriptions");
         System.out.printf(format, "-q or q: ", "Quit command will terminate program");

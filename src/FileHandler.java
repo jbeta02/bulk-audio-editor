@@ -3,6 +3,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 // Purpose: Utility functions for actions relating to file interactions
@@ -57,6 +58,7 @@ public class FileHandler {
 
     // handle file overrides ----------------------------------------------
 
+    // ask check if file already exist, if it does then ask user if override is ok
     public static boolean isOverrideAllowed(String outputFileName, String outputPath) {
         // check if output already exists
         // if yes, prompt if override desired > if yes then finish, if no then stop
@@ -91,7 +93,7 @@ public class FileHandler {
         File outPathAsFile = new File(outputPath);
 
         if (outPathAsFile.isDirectory()){
-            for (File file :outPathAsFile.listFiles()) {
+            for (File file : outPathAsFile.listFiles()) {
                 if (file.isFile()) {
                     Log.print("file name", file.getName());
                     if (outputFileName.equals(file.getName())) {
@@ -109,7 +111,7 @@ public class FileHandler {
         return alreadyExists;
     }
 
-    // simple checks ----------------------------------------------
+    // checks ----------------------------------------------
 
     // check if file
     public static boolean isFile(String path){
@@ -129,7 +131,7 @@ public class FileHandler {
         return file.isDirectory();
     }
 
-    // simple getters ----------------------------------------------
+    // getters ----------------------------------------------
 
     // return file's path but exclude the file from the path string
     public static String getPathNoName(File file) {
@@ -157,8 +159,23 @@ public class FileHandler {
         return newPath;
     }
 
-    // TODO check if valid path
+    // convert path to File obj
     public static File getFile(String path) {
         return new File(path);
+    }
+
+    // get all folders from a given directory path
+    public static ArrayList<File> getFolders(String path) {
+        ArrayList<File> folders = new ArrayList<>();
+        File pathAsFile = getFile(path);
+
+
+        for (File file : pathAsFile.listFiles()) {
+            if (file.isDirectory()) {
+                folders.add(file);
+            }
+        }
+
+        return folders;
     }
 }
