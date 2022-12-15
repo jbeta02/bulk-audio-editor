@@ -1,7 +1,5 @@
 // Purpose: Main program class, prompt for and run commands
 
-import org.jaudiotagger.tag.FieldKey;
-
 import java.io.File;
 import java.util.Scanner;
 
@@ -11,24 +9,47 @@ public class Program {
 
     // main method, provide user interface and run commands
     public static void main(String[] args) { //TODO when Version 1 finished create a releases tag on GitHub
+
+        // run program (in user mode)
+        runProgram();
+    }
+
+    // TODO continuous loop of run program makes it difficult to run a junit test on. Consider re-design?
+    // run program method (parameters will determine if program will run in test mode or user mode)
+    public static void runProgram(String pathArg, String commandArg, String commandInputArg, String commandOutputPathArg) {
         MP3Editor mp3Editor;
         String[] command;
         String path;
 
-        // intro to program
-        System.out.println("Welcome to \"Bulk Audio Editor\"");
-        System.out.println("-------------------------------");
-        System.out.println("Enter path to a single Mp3 file or a folder holding MP3 files");
-        System.out.println("(enter h for more information)");
+        // if parameters are not empty then enter testing mode (use given arguments instead of prompting user)
+        if (!pathArg.equals("") && !commandArg.equals("")) {
 
-        // prompt for valid path
-        path = promptForPath();
+            // set path
+            path = pathArg;
 
-        // create mp3Editor obj and inter path to mp3 files as constructor argument
-        mp3Editor = new MP3Editor(path);
+            // create mp3Editor obj and enter path to mp3 files
+            mp3Editor = new MP3Editor(path);
 
-        // prompt for command
-        command = promptForCommand(mp3Editor.getInputPath()); // command = array [command, commandInput, output path]
+            // set command
+            command = new String[]{commandArg, commandInputArg, commandOutputPathArg};
+        }
+        // enter user mode (let user enter arguments)
+        else {
+            // intro to program
+            System.out.println("Welcome to \"Bulk Audio Editor\"");
+            System.out.println("-------------------------------");
+            System.out.println("Enter path to a single Mp3 file or a folder holding MP3 files");
+            System.out.println("(enter h for more information)");
+
+            // prompt for valid path
+            path = promptForPath();
+
+            // create mp3Editor obj and enter path to mp3 files
+            mp3Editor = new MP3Editor(path);
+
+            // prompt for command
+            command = promptForCommand(mp3Editor.getInputPath()); // command = array [command, commandInput, output path]
+        }
 
         // check for valid output path then check if there are file conflicts
         if (!command[2].equals("")) {
@@ -54,6 +75,7 @@ public class Program {
             }
         }
 
+        // run command
         while(!command[0].equals("-q") & !command[0].equals("q")) {
             switch(command[0]) {
                 case "ab":
@@ -140,6 +162,11 @@ public class Program {
         }
 
         System.out.println("\nClosing Program...");
+    }
+
+    // run program in user mode
+    public static void runProgram() {
+        runProgram("", "", "", "");
     }
 
     // display a description of Bulk Audio Editor
