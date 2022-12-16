@@ -157,7 +157,7 @@ public class Program {
     private static void displayHelp() {
         String format = "%-30s %s\n";
 
-        System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command");
+        System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command (see examples below)");
         System.out.printf(format, "", "\t\tWill be either folder or file path depending on initial path set");
         System.out.printf(format, "ab [text]: ", "Add command will add [text] to beginning");
         System.out.printf(format, "ae [text]: ", "Add command will add [text] to end");
