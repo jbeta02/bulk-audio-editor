@@ -4,7 +4,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
 
 // jaudiotagger is an external library for manipulating mp3 files
 import org.jaudiotagger.audio.AudioFileIO;

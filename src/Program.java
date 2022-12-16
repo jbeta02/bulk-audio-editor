@@ -1,7 +1,5 @@
 // Purpose: Main program class, prompt for and run commands
 
-import org.jaudiotagger.tag.FieldKey;
-
 import java.io.File;
 import java.util.Scanner;
 
