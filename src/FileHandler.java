@@ -67,8 +67,8 @@ public class FileHandler {
 
             Scanner input = new Scanner(System.in);
 
-            System.out.println("file " + outputFileName + " already exists in " + outputPath + ". Do you want to override existing file?");
-            System.out.print("Enter y or n: ");
+            UserFeedback.print("file " + outputFileName + " already exists in " + outputPath + ". Do you want to override existing file?");
+            UserFeedback.print("Enter y or n: ");
 
             switch (input.nextLine()){
                 case "y":
@@ -78,7 +78,7 @@ public class FileHandler {
                     isAllowed = false;
                     break;
                 default:
-                    System.out.println("Enter y or n. Will prompt again.");
+                    UserFeedback.print("Enter y or n. Will prompt again.");
                     isAllowed = isOverrideAllowed(outputFileName, outputPath);
                     break;
             }
@@ -95,7 +95,6 @@ public class FileHandler {
         if (outPathAsFile.isDirectory()){
             for (File file : outPathAsFile.listFiles()) {
                 if (file.isFile()) {
-                    Log.print("file name", file.getName());
                     if (outputFileName.equals(file.getName())) {
                         alreadyExists = true;
                         break;
@@ -177,5 +176,9 @@ public class FileHandler {
         }
 
         return folders;
+    }
+
+    public static String getFileExtension(String fileName) {
+        return fileName.substring(fileName.lastIndexOf("."));
     }
 }

@@ -233,9 +233,9 @@ public class Program {
         }
         // if not then it is a stand along command
 
-        Log.print("command", "<" + command + ">");
-        Log.print("command input", "<" + commandInput + ">");
-        Log.print("out path", "<" + outputPath + ">");
+        UserFeedback.printIndent("command", "<" + command + ">");
+        UserFeedback.printIndent("command input", "<" + commandInput + ">");
+        UserFeedback.printIndent("out path", "<" + outputPath + ">");
 
         fullCommand = new String[]{command, commandInput, outputPath};
 
@@ -256,7 +256,7 @@ public class Program {
             );
             if (!isValidOutput) {
                 // prompt for command
-                Log.print("Re-enter command");
+                UserFeedback.print("re-enter command");
                 command = promptForCommand(path, mp3Editor);
             }
             // if output valid then check file conflicts

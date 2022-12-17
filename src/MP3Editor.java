@@ -49,8 +49,6 @@ public class MP3Editor {
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
-        Log.print("mp3 file before add command", mp3Files.get(0).getFile().getPath());
-
         // get names
         for (MP3File file : mp3Files) {
             // save the current name
@@ -74,9 +72,6 @@ public class MP3Editor {
             Path oldFilePath = Paths.get(file.getFile().getPath());
             // get file properties from mp3 obj then get path without a file name, add newName as file
             Path newFilePath = Paths.get(FileHandler.getPathNoName(file.getFile()), newName);
-
-            Log.print("old name", currentName);
-            Log.print("new name", newName);
 
             try{
                 Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -102,8 +97,6 @@ public class MP3Editor {
             setFiles(newFilesPath);
         }
 
-        Log.print("mp3 file after add command", mp3Files.get(0).getFile().getPath());
-
     }
 
     // remove text pattern from file name
@@ -115,8 +108,6 @@ public class MP3Editor {
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
-
-        Log.print("mp3 file before remove command", mp3Files.get(0).getFile().getPath());
 
         // get names
         for (MP3File file : mp3Files) {
@@ -133,8 +124,6 @@ public class MP3Editor {
 
             // only make change if needed
             if (!oldFilePath.equals(newFilePath)) {
-                Log.print("old name", currentName);
-                Log.print("new name", newName);
 
                 try{
                     Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
@@ -161,8 +150,6 @@ public class MP3Editor {
             setFiles(newFilesPath);
         }
 
-        Log.print("mp3 file after remove command", mp3Files.get(0).getFile().getPath());
-
     }
 
     // general algorithm for modifying metadata
@@ -175,8 +162,6 @@ public class MP3Editor {
             // get tag which contains metadata
             Tag tag = file.getTag();
 
-            Log.print("old " + fieldKey.name() + " text", tag.getFirst(fieldKey));
-
             try {
                 // set new metadata value
                 tag.setField(fieldKey, text);
@@ -188,11 +173,9 @@ public class MP3Editor {
             catch (Exception e) {
                 Log.errorE("Unable to set new album text", e);
             }
-
-            Log.print("new " + fieldKey.name() + " text", tag.getFirst(fieldKey));
-
-            setFiles(outputPath);
         }
+        // set output as target files
+        setFiles(outputPath);
     }
 
     // change artist text
@@ -325,7 +308,7 @@ public class MP3Editor {
         // print top data
         // folder name      total files
         if (mp3Files.size() > 0) {
-            System.out.printf("%s %-50s %s %s\n\n", "Path:", FileHandler.getPathNoName(mp3Files.get(0).getFile()), "Total File Count:" , mp3Files.size());
+            System.out.printf("%s %-50s %s %s\n\n", "Current target Path:", FileHandler.getPathNoName(mp3Files.get(0).getFile()), "Total File Count:" , mp3Files.size());
         }
         else {
             System.out.println("No files in folder");
@@ -454,8 +437,6 @@ public class MP3Editor {
 
                 if (!tag.getFirst(fieldKey).equals("")) {
 
-                    Log.print("number of folders in output", folders.size());
-
                     // check if folder name conflicts exist, if so then check if folder contains file name conflicts,
                     //      if so ask then ask if override ok
                     for (File folder : folders) {
@@ -490,12 +471,11 @@ public class MP3Editor {
                     }
 
                     // delete old file (not inside folder) if work being done inside input folder
-                    Log.print("value of outputPath", outputPath);
                     if (originalOutputPath.equals("")) {
                         try {
-                            Log.print("attempting to delete", file.getFile().getName());
                             Files.delete(file.getFile().toPath());
-                        } catch (IOException e) {
+                        }
+                        catch (IOException e) {
                             Log.errorE("Unable to remove copy of " + file.getFile().getName() + ",so not in folder", e);
                         }
                     }
@@ -503,10 +483,9 @@ public class MP3Editor {
             }
             setInputPath(outputPath);
             setFiles(outputPath);
-            Log.print("should set output as intput");
         }
         else {
-            Log.print("To use this command output path must be a folder.");
+            UserFeedback.print("To use this command output path must be a folder.");
         }
     }
 
@@ -538,7 +517,6 @@ public class MP3Editor {
                 outputPath = FileHandler.createPath(outputPath, mp3Files.get(i).getFile().getName());
             }
 
-            Log.print("performing normalization on", mp3Files.get(i).getFile().getPath());
             // run ffmpeg normalization command
             fFmpegWrapper.normalizeLoudness(mp3Files.get(i).getFile().getPath(), integratedLoudness, truePeak, outputPath);
 
@@ -556,7 +534,6 @@ public class MP3Editor {
             copyFilesToOutput(inputPath);
             for (File file : FileHandler.getFile(TEMP_FOLDER).listFiles()) {
                 if (file.isFile()) {
-                    Log.print("from temp, deleted", file.getName());
                     file.delete();
                 }
             }
@@ -624,7 +601,7 @@ public class MP3Editor {
                     }
                 }
             }
-            Log.print("Target path CHANGED to", inputPath);
+            UserFeedback.printIndent("Target path CHANGED to", inputPath);
         }
     }
 
@@ -676,32 +653,32 @@ public class MP3Editor {
 
         // check if path leads to folder
         if (file.isDirectory() & !file.isFile()) {
-            Log.print("is folder");
+            UserFeedback.print("Input path leads to folder");
 
             // loop through files, convert each to MP3 obj and add to arraylist
             for (File fileInLoop : file.listFiles()) {
-                Log.print("file", fileInLoop);
 
-                // TODO determine if file found is mp3
+                // check if file is mp3
+                if (FileHandler.isFile(fileInLoop.getPath()) && FileHandler.getFileExtension(fileInLoop.getName()).contains("mp3")){
+                    // might not be able to read file
+                    try {
+                        MP3File convertedFile = (MP3File) AudioFileIO.read(fileInLoop);
 
-                // might not be able to read file
-                try {
-                    MP3File convertedFile = (MP3File) AudioFileIO.read(fileInLoop);
-
-                    mp3Files.add(convertedFile);
-                } catch (Exception e) {
-                    Log.error("Unable to internally classify file with name", fileInLoop.getName());
-                    Log.error("Error msg", e.getMessage());
+                        mp3Files.add(convertedFile);
+                    }
+                    catch (Exception e) {
+                        Log.errorE("Unable to internally classify file with name: " + fileInLoop.getName(), e);
+                    }
                 }
             }
 
             // verify number of files found
-            Log.print("number of files found", mp3Files.size());
+            UserFeedback.printIndent("Number of files found", mp3Files.size());
         }
 
         // check if path leads to file
         else if (!file.isDirectory() & file.isFile()) {
-            Log.print("is file");
+            UserFeedback.print("Input path leads to file");
 
             // might not be able to read file
             try {
@@ -710,12 +687,8 @@ public class MP3Editor {
                 mp3Files.add(convertedFile);
             }
             catch (Exception e) {
-                Log.error("Unable to internally classify file with name", file.getName());
-                Log.error("Error msg", e.getMessage());
+                Log.error("Unable to internally classify file with name" + file.getName(), e);
             }
-
-            // verify that there is only one file
-            Log.print("Only one file found", mp3Files.size() == 1);
         }
     }
 

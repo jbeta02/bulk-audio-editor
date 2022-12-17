@@ -39,12 +39,12 @@ public class UserFeedback {
         return progressBar;
     }
 
-
-    public static void printIndent(String label, String value) {
-
+    public static void print(String statement) {
+        System.out.println(statement);
     }
 
-    public static void print(String statement) {
-
+    public static void printIndent(String label, Object value) {
+        String format = "%-30s %s\n";
+        System.out.printf(format, label + ":", value);
     }
 }
