@@ -653,7 +653,7 @@ public class MP3Editor {
 
         // check if path leads to folder
         if (file.isDirectory() & !file.isFile()) {
-            UserFeedback.print("Input path leads to folder");
+            UserFeedback.print("Input path leads a to folder");
 
             // loop through files, convert each to MP3 obj and add to arraylist
             for (File fileInLoop : file.listFiles()) {
@@ -678,7 +678,7 @@ public class MP3Editor {
 
         // check if path leads to file
         else if (!file.isDirectory() & file.isFile()) {
-            UserFeedback.print("Input path leads to file");
+            UserFeedback.print("Input path leads to a file");
 
             // might not be able to read file
             try {

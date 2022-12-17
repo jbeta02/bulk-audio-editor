@@ -37,40 +37,48 @@ public class FFmpegWrapper {
 
     // implementation of loudness normalization using ffmpeg
     public void normalizeLoudness(String inputFile, double integrateLoudness, double truePeak, String outputFile) {
-        try{
-            // check that input integratedLoudness and truePeak are valid
-            setIntegratedLoudness(integrateLoudness);
-            setTruePeak(truePeak);
 
-            // extract loudness stats for future use
-            extractLoudnessStats(inputFile);
+        // check if values set successfully set
+        if (setIntegratedLoudness(integrateLoudness) && setTruePeak(truePeak)) {
+            try{
+                // check that input integratedLoudness and truePeak are valid
+                setIntegratedLoudness(integrateLoudness);
+                setTruePeak(truePeak);
 
-            // setup ffmpeg command
-            String[] passTwo = {"-i", inputFile, "-af",
-                    "loudnorm=" +
-                            "I=" + integrateLoudness +
-                            ":TP=" + truePeak +
-                            ":LRA=" + measuredLRA + // use measured LRA as target to force linear normalization
-                            ":measured_I=" + measuredI +
-                            ":measured_LRA=" + measuredLRA +
-                            ":measured_TP=" + measuredTp +
-                            ":measured_thresh=" + measuredThresh +
-                            ":offset=" + offset +
-                            ":linear=true" +
-                            ":print_format=json",
-                    "-hide_banner", "-y", "-ar", "48k", outputFile};
+                // extract loudness stats for future use
+                extractLoudnessStats(inputFile);
 
-            // run command and save output to print
-            ArrayList<String> commandResult = runFfmpegCommand(passTwo);
+                // setup ffmpeg command
+                String[] passTwo = {"-i", inputFile, "-af",
+                        "loudnorm=" +
+                                "I=" + integrateLoudness +
+                                ":TP=" + truePeak +
+                                ":LRA=" + measuredLRA + // use measured LRA as target to force linear normalization
+                                ":measured_I=" + measuredI +
+                                ":measured_LRA=" + measuredLRA +
+                                ":measured_TP=" + measuredTp +
+                                ":measured_thresh=" + measuredThresh +
+                                ":offset=" + offset +
+                                ":linear=true" +
+                                ":print_format=json",
+                        "-hide_banner", "-y", "-ar", "48k", outputFile};
+
+                // run command and save output to print
+                ArrayList<String> commandResult = runFfmpegCommand(passTwo);
 //            Log.print("running ffmpeg command (normalize loudness)", FFMPEG + arrayToString(passTwo));
 
-            // print output
+                // print output
 //            for (String outputLine : commandResult) {
 //                Log.print("command output", outputLine);
 //            }
+            }
+            catch (Exception e) {
+                Log.errorE("error running ffmpeg", e);
+            }
         }
-        catch (Exception e) {
-            Log.errorE("error running ffmpeg", e);
+        // values not set successfully, tell user that command was skipped
+        else {
+            Log.error("Loudness values not set correctly, normalization was skipped. Run command again with new values");
         }
     }
 
@@ -207,7 +215,7 @@ public class FFmpegWrapper {
     private boolean withinRange(double value, double min, double max) {
         boolean inRange = false;
         if (value < min || value > max) {
-            Log.error("value entered " + value + ", must be between " + min  + " - " + max);
+            Log.error("Value entered " + value + ", must be between " + min  + " and " + max);
         }
         else {
             inRange = true;
@@ -217,20 +225,20 @@ public class FFmpegWrapper {
 
     // accessors and mutators ----------------------------------------------
 
-    //TODO change how program reacts to bad data (curr: set default vals > new: ask to enter values again)
-
     public double getIntegratedLoudness() {
         return integratedLoudness;
     }
 
     // set a valid integrated loudness
-    public void setIntegratedLoudness(double targetInLUFS) {
-        if (!withinRange(targetInLUFS, -70, -5)) {
-            Log.error("Will set to default integrated loudness to ", INTEGRATED_LOUDNESS + " LUFS");
-        }
-        else {
+    public boolean setIntegratedLoudness(double targetInLUFS) {
+        boolean success = false;
+
+        if (withinRange(targetInLUFS, -70, -5)) {
             integratedLoudness = targetInLUFS;
+            success = true;
         }
+
+        return success;
     }
 
     //---------------
@@ -255,13 +263,15 @@ public class FFmpegWrapper {
         return truePeak;
     }
 
-    public void setTruePeak(double targetInDB) {
-        if (!withinRange(targetInDB, -9, 0)) {
-            Log.error("Will set default true peak to ", TRUE_PEAK);
-        }
-        else {
+    public boolean setTruePeak(double targetInDB) {
+        boolean success = false;
+
+        if (withinRange(targetInDB, -9, 0)) {
             truePeak = targetInDB;
+            success = true;
         }
+
+        return success;
     }
 
     //---------------
