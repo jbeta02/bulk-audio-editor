@@ -9,9 +9,13 @@ import java.util.Comparator;
 
 // jaudiotagger is an external library for manipulating mp3 files
 import org.jaudiotagger.audio.AudioFileIO;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
+import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
@@ -26,7 +30,7 @@ public class MP3Editor {
 
     private ArrayList<MP3File> mp3FilesNoOverride = new ArrayList<>();
 
-    private final String TEMP_FOLDER = "temp/";
+    private final String TEMP_FOLDER = "temp\\";
 
     // Constructor used to populate mp3Files ArrayList so that it may be used in other methods after instantiation
     public MP3Editor(String path) {
@@ -39,9 +43,13 @@ public class MP3Editor {
     public void addToFileName(boolean addToStart, String textToAdd, String outputPath) {
         String currentName;
         String newName;
+        // will hold newly created files to set as new target mp3Files
+        String newFilesPath = "";
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
+
+        Log.print("mp3 file before add command", mp3Files.get(0).getFile().getPath());
 
         // get names
         for (MP3File file : mp3Files) {
@@ -84,16 +92,31 @@ public class MP3Editor {
             catch (Exception e) {
                 Log.errorE("Failed to save file with new name", e);
             }
+
+            // track newly produced file path
+            newFilesPath = FileHandler.getPathNoName(file.getFile());
         }
+
+        // will allow commands to be ran on new files
+        if (!newFilesPath.equals("")){
+            setFiles(newFilesPath);
+        }
+
+        Log.print("mp3 file after add command", mp3Files.get(0).getFile().getPath());
+
     }
 
     // remove text pattern from file name
     public void removeFromFileName(String textToRemove, String outputPath) {
         String currentName;
         String newName;
+        // will hold newly created files to set as new target mp3Files
+        String newFilesPath = "";
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
+
+        Log.print("mp3 file before remove command", mp3Files.get(0).getFile().getPath());
 
         // get names
         for (MP3File file : mp3Files) {
@@ -108,24 +131,38 @@ public class MP3Editor {
             // get file properties from mp3 obj then get path without a file name, add newName as file
             Path newFilePath = Paths.get(FileHandler.getPathNoName(file.getFile()), newName);
 
-            Log.print("old name", currentName);
-            Log.print("new name", newName);
+            // only make change if needed
+            if (!oldFilePath.equals(newFilePath)) {
+                Log.print("old name", currentName);
+                Log.print("new name", newName);
 
-            try{
-                Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
-            }
-            catch (Exception e) {
-                Log.errorE("Failed to save file with new name", e);
+                try{
+                    Files.copy(oldFilePath, newFilePath, StandardCopyOption.REPLACE_EXISTING);
+                }
+                catch (Exception e) {
+                    Log.errorE("Failed to save file with new name", e);
+                }
+
+                // delete old file
+                try{
+                    Files.delete(oldFilePath);
+                }
+                catch (Exception e) {
+                    Log.errorE("Failed to save file with new name", e);
+                }
             }
 
-            // delete old file
-            try{
-                Files.delete(oldFilePath);
-            }
-            catch (Exception e) {
-                Log.errorE("Failed to save file with new name", e);
-            }
+            // track newly produced file path
+            newFilesPath = FileHandler.getPathNoName(file.getFile());
         }
+
+        // will allow commands to be run on new files
+        if (!newFilesPath.equals("")){
+            setFiles(newFilesPath);
+        }
+
+        Log.print("mp3 file after remove command", mp3Files.get(0).getFile().getPath());
+
     }
 
     // general algorithm for modifying metadata
@@ -153,6 +190,8 @@ public class MP3Editor {
             }
 
             Log.print("new " + fieldKey.name() + " text", tag.getFirst(fieldKey));
+
+            setFiles(outputPath);
         }
     }
 
@@ -396,6 +435,7 @@ public class MP3Editor {
     // metadata such as Album, Artist, Genre
     private void createFoldersFor(FieldKey fieldKey, String outputPath) {
         ArrayList<File> folders;
+        String originalOutputPath = outputPath;
 
         // use output as input if user wants to keep work input folder
         if (outputPath.equals("")) {
@@ -412,54 +452,59 @@ public class MP3Editor {
                 boolean nameConflict = false;
                 Tag tag = file.getTag();
 
-                Log.print("number of folders in output", folders.size());
+                if (!tag.getFirst(fieldKey).equals("")) {
 
-                // check if folder name conflicts exist, if so then check if folder contains file name conflicts,
-                //      if so ask then ask if override ok
-                for (File folder : folders) {
-                    // check if folder name conflicts exist
-                    if (tag.getFirst(fieldKey).contains(folder.getName())) {
+                    Log.print("number of folders in output", folders.size());
 
-                        // check if name conflicts
-                        if (FileHandler.isOverrideAllowed(file.getFile().getName(), folder.toString())) {
-                            // add files to new folder
-                            FileHandler.copyFile(file.getFile(), (folder.toString()));
-                        }
-                        nameConflict = true;
-                    }
-                }
+                    // check if folder name conflicts exist, if so then check if folder contains file name conflicts,
+                    //      if so ask then ask if override ok
+                    for (File folder : folders) {
+                        // check if folder name conflicts exist
+                        if (tag.getFirst(fieldKey).contains(folder.getName())) {
 
-                // if no other folders with possible name conflicts exist then new create folder and place files inside
-                if (!nameConflict) {
-                    try {
-                        // create folder and add to list of folders
-                        Path createdFolder = Paths.get(outputPath, tag.getFirst(fieldKey));
-                        Files.createDirectory(createdFolder);
-                        folders.add(createdFolder.toFile());
-
-                        // check if name conflicts
-                        if (FileHandler.isOverrideAllowed(file.getFile().getName(), createdFolder.toString())) {
-                            // add files to new folder
-                            FileHandler.copyFile(file.getFile(), (createdFolder.toString()));
+                            // check if name conflicts
+                            if (FileHandler.isOverrideAllowed(file.getFile().getName(), folder.toString())) {
+                                // add files to new folder
+                                FileHandler.copyFile(file.getFile(), (folder.toString()));
+                            }
+                            nameConflict = true;
                         }
                     }
-                    catch (Exception e) {
-                        Log.errorE("Unable to create new folder", e);
-                    }
-                }
 
-                // delete old file (not inside folder) if work being done inside input folder
-                if (outputPath.equals("")) {
-                    try {
-                        Files.delete(file.getFile().toPath());
+                    // if no other folders with possible name conflicts exist then new create folder and place files inside
+                    if (!nameConflict) {
+                        try {
+                            // create folder and add to list of folders
+                            Path createdFolder = Paths.get(outputPath, tag.getFirst(fieldKey));
+                            Files.createDirectory(createdFolder);
+                            folders.add(createdFolder.toFile());
+
+                            // check if name conflicts
+                            if (FileHandler.isOverrideAllowed(file.getFile().getName(), createdFolder.toString())) {
+                                // add files to new folder
+                                FileHandler.copyFile(file.getFile(), (createdFolder.toString()));
+                            }
+                        } catch (Exception e) {
+                            Log.errorE("Unable to create new folder", e);
+                        }
                     }
-                    catch (IOException e) {
-                        Log.errorE("Unable to remove copy of " + file.getFile().getName() + " not in folder", e);
+
+                    // delete old file (not inside folder) if work being done inside input folder
+                    Log.print("value of outputPath", outputPath);
+                    if (originalOutputPath.equals("")) {
+                        try {
+                            Log.print("attempting to delete", file.getFile().getName());
+                            Files.delete(file.getFile().toPath());
+                        } catch (IOException e) {
+                            Log.errorE("Unable to remove copy of " + file.getFile().getName() + ",so not in folder", e);
+                        }
                     }
                 }
             }
+            setInputPath(outputPath);
+            setFiles(outputPath);
+            Log.print("should set output as intput");
         }
-
         else {
             Log.print("To use this command output path must be a folder.");
         }
@@ -470,6 +515,8 @@ public class MP3Editor {
         // create ffmpegWrapper obj to run loudness normalization command
         FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
         boolean usingTemp = false;
+        boolean isOutputFolder;
+        String originalOutPath;
 
         // used temp as output path if no output path is set by user
         if (outputPath.equals("")) {
@@ -477,30 +524,46 @@ public class MP3Editor {
             usingTemp = true;
         }
 
+        // save original path since it will be overridden later
+        originalOutPath = outputPath;
+
+        // check if folder so we can build a path accordingly
+        isOutputFolder = FileHandler.isFolder(outputPath);
+
         // normalize loudness of all target files
         for (int i = 0; i < mp3Files.size(); i++) {
             // if outputPath is a folder then will need to change to file specific path for ffmpeg
-            if (FileHandler.isFolder(outputPath)) {
-                // add name to curr file to path
+            if (isOutputFolder) {
+                // add name of curr file to path
                 outputPath = FileHandler.createPath(outputPath, mp3Files.get(i).getFile().getName());
             }
+
+            Log.print("performing normalization on", mp3Files.get(i).getFile().getPath());
             // run ffmpeg normalization command
             fFmpegWrapper.normalizeLoudness(mp3Files.get(i).getFile().getPath(), integratedLoudness, truePeak, outputPath);
 
             // create progress bar
-            UserFeedback.progressBar("Progress Getting Loudness Data", i + 1, mp3Files.size());
+            UserFeedback.progressBar("Progress Normalizing Loudness", i + 1, mp3Files.size());
+
+            // reset output path
+            outputPath = originalOutPath;
         }
 
-        // (not needed if an output path is specified
+        // (not needed if an output path is specified)
         // copied normalized files from temp to input then delete files in temp
         if (usingTemp) {
+            setFiles(TEMP_FOLDER);
             copyFilesToOutput(inputPath);
             for (File file : FileHandler.getFile(TEMP_FOLDER).listFiles()) {
                 if (file.isFile()) {
-                    Log.print("cleaned temp");
+                    Log.print("from temp, deleted", file.getName());
                     file.delete();
                 }
             }
+        }
+        else {
+            setInputPath(originalOutPath);
+            setFiles(outputPath);
         }
     }
 
@@ -548,9 +611,9 @@ public class MP3Editor {
         if (!outputPath.equals("")) {
             // set new target path since work will likely be done to new files instead of old ones
             setInputPath(outputPath);
-            setFiles(outputPath);
+            mp3Files = transferInputMp3ToOutput(outputPath);
 
-            // from new mp3 files remove noOverride files be checking is names correspond
+            // from new mp3 files remove override not allowed files by checking if names correspond
             if (mp3FilesNoOverride.size() > 0) {
                 for (int i = 0; i < mp3Files.size(); i++) {
 
@@ -563,6 +626,29 @@ public class MP3Editor {
             }
             Log.print("Target path CHANGED to", inputPath);
         }
+    }
+
+    // transfer input files to output
+    private ArrayList<MP3File> transferInputMp3ToOutput(String outputPath) {
+        ArrayList<MP3File> targetFiles = new ArrayList<>();
+
+        if (FileHandler.isFile(outputPath)) {
+            outputPath = FileHandler.getPathNoName(outputPath);
+        }
+
+        // convert input files to output
+        for (MP3File file : mp3Files) {
+            try {
+                MP3File newTargetFile = new MP3File(FileHandler.getFile(FileHandler.createPath(outputPath, file.getFile().getName())));
+
+                targetFiles.add(newTargetFile);
+            }
+            catch (Exception e) {
+                Log.errorE("Unable to transfer file to output", e);
+            }
+        }
+
+        return targetFiles;
     }
 
     // convert seconds to min:sec format

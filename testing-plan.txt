@@ -1,0 +1,13 @@
+commands to test
+    ab
+    r
+    A
+    LN
+    ffA
+
+Test all without output
+
+Test all with output
+
+Test all with output then run same command without output in same program instance
+

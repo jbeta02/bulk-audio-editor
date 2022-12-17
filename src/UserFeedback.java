@@ -38,4 +38,13 @@ public class UserFeedback {
 
         return progressBar;
     }
+
+
+    public static void printIndent(String label, String value) {
+
+    }
+
+    public static void print(String statement) {
+
+    }
 }

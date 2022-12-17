@@ -26,31 +26,7 @@ public class Program {
         mp3Editor = new MP3Editor(path);
 
         // prompt for command
-        command = promptForCommand(mp3Editor.getInputPath()); // command = array [command, commandInput, output path]
-
-        // check for valid output path then check if there are file conflicts
-        if (!command[2].equals("")) {
-            // first check output
-            boolean isValidOutput = FileHandler.isPathLogical(
-                    FileHandler.isFolder(path),
-                    FileHandler.isFolder(command[2])
-            );
-            if (!isValidOutput) {
-                // prompt for command
-                Log.print("Re-enter command");
-                command = promptForCommand(mp3Editor.getInputPath());
-            }
-            // if output valid then check file conflicts
-            else {
-
-                // cffAr and cffA commands handle name conflicts internally
-                if (!command[0].equals("cffAr") && !command[0].equals("cffA")){
-                    // check if there are name conflicts
-                    // (if conflicts exists then ask if overriding ok, if override not ok then skip file)
-                    mp3Editor.skipOverrideDenials(command[2]);
-                }
-            }
-        }
+        command = promptForCommand(mp3Editor.getInputPath(), mp3Editor); // command = array [command, commandInput, output path]
 
         while(!command[0].equals("-q") & !command[0].equals("q")) {
             switch(command[0]) {
@@ -89,14 +65,24 @@ public class Program {
 
                 // normalize with custom loudness
                 case "LNN":
-                    mp3Editor.normalizeFiles(toDouble(command[1]), command[2]);
+                    // make sure value is double
+                    try {
+                        Double.parseDouble(command[1]);
+                    }
+                    catch (Exception e) {
+                        Log.errorE("Value entered is not a valid number. Try again", e);
+                        command = promptForCommand(mp3Editor.getInputPath(), mp3Editor);
+                    }
+                    // enter custom loudness as double
+                    double loudnessValue = Double.parseDouble(command[1]);
+                    mp3Editor.normalizeFiles(loudnessValue, command[2]);
                     break;
 
-                case "cffAr":
+                case "ffAr":
                     mp3Editor.createFoldersByArtist(command[2]);
                     break;
 
-                case "cffA":
+                case "ffA":
                     mp3Editor.createFoldersByAlbum(command[2]);
                     break;
 
@@ -134,7 +120,7 @@ public class Program {
                     System.out.println("(List of commands can be produced using \"h\" command)\n");
                     break;
             }
-            command = promptForCommand(mp3Editor.getInputPath());
+            command = promptForCommand(mp3Editor.getInputPath(), mp3Editor);
         }
 
         System.out.println("\nClosing Program...");
@@ -157,10 +143,10 @@ public class Program {
     private static void displayHelp() {
         String format = "%-30s %s\n";
 
-        System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file after command (see examples below)");
-        System.out.printf(format, "", "\t\tWill be either folder or file path depending on initial path set");
-        System.out.printf(format, "ab [text]: ", "Add command will add [text] to beginning");
-        System.out.printf(format, "ae [text]: ", "Add command will add [text] to end");
+        System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file(s) (see examples below)");
+        System.out.printf(format, "", "\t\tWill be either folder or file path depending on the input path set");
+        System.out.printf(format, "ab [text]: ", "Add command beginning command will add [text] to beginning");
+        System.out.printf(format, "ae [text]: ", "Add command end command will add [text] to end");
         System.out.printf(format, "r [text]: ", "Remove command will remove [text] from files");
         System.out.printf(format, "Ar [artist text]: ", "Artist command will add [artist text] to artist metadata of files");
         System.out.printf(format, "A [album text]: ", "Album command will add [album text] to album metadata of files");
@@ -168,12 +154,12 @@ public class Program {
         System.out.printf(format, "Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
         System.out.printf(format, "LN: ", "Loudness Normalize command will make loudness of files similar.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LU.");
-        System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range");
+        System.out.printf(format, "", "\t\tInternally, true peak set to -2 dBFS and loudness range set to match file's current range");
         System.out.printf(format, "LNN [LUFS value]: ", "Loudness Normalize command (same as -LN but with custom loudness) will take a value in LU and bring the loudness of files to that target.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Recommended LU values are -24 to -14 (numbers closer to 0 are louder).");
-        System.out.printf(format, "", "\t\tInternally, true peak set to -2 and loudness range set to match file's current range\"");
-        System.out.printf(format, "cffA: ", "Create folders for album will create folder for files based on their album then put the files in those folders");
-        System.out.printf(format, "cffAr: ", "Create folders for artist will create folder for files based on their artist then put the files in those folders");
+        System.out.printf(format, "", "\t\tInternally, true peak set to -2 dBFS and loudness range set to match file's current range\"");
+        System.out.printf(format, "ffA: ", "Folders for album command will create folder for files based on their album then put the files in those folders");
+        System.out.printf(format, "ffAr: ", "Folders for artist command will create folder for files based on their artist then put the files in those folders");
         System.out.printf(format, "DN: ", "Display by name command will display the metadata of the files organized by name");
         System.out.printf(format, "DAr: ", "Display by artist command will display the metadata of the files organized by artist name");
         System.out.printf(format, "DA: ", "Display by album command will display the metadata of the files organized by album");
@@ -196,7 +182,7 @@ public class Program {
         System.out.println("LN -o C:folder1/folder2/");
         System.out.println("Loudness Normalization command with custom loudness with and without output path modifier");
         System.out.println("LNN -23");
-        System.out.println("LNN -o C:folder1/folder2/out-file.mp3");
+        System.out.println("LNN -23 -o C:folder1/folder2/out-file.mp3");
     }
 
     // recursively prompt for path until a valid path is entered
@@ -225,12 +211,13 @@ public class Program {
     }
 
     // prompt for command, returns [command, commandInput, outputPath] as array
-    private static String[] promptForCommand(String currInputPath) {
+    private static String[] promptForCommand(String currInputPath, MP3Editor mp3Editor) {
         System.out.println("\nCurrent target path: " + currInputPath);
         System.out.print("\nEnter command: ");
         String command = input.nextLine();
         String commandInput = "";
         String outputPath = "";
+        String[] fullCommand = {"", "", ""};
 
         // check if user entered output modifier
         if (command.contains(" -o ")) {
@@ -250,20 +237,40 @@ public class Program {
         Log.print("command input", "<" + commandInput + ">");
         Log.print("out path", "<" + outputPath + ">");
 
-        return new String[]{command, commandInput, outputPath};
+        fullCommand = new String[]{command, commandInput, outputPath};
+
+        // if an output path is specified that make sure it is logical and there are no name conflicts
+        fullCommand = checkOutputValidity(fullCommand, currInputPath, mp3Editor);
+
+        return fullCommand;
     }
 
-    private static double toDouble(String stringVal) {
-        double value = 0;
+    // check for valid output path then check if there are file conflicts
+    private static String[] checkOutputValidity(String[] command, String path, MP3Editor mp3Editor) {
+        // check for valid output path then check if there are file conflicts
+        if (!command[2].equals("")) {
+            // first check output
+            boolean isValidOutput = FileHandler.isPathLogical(
+                    FileHandler.isFolder(path),
+                    FileHandler.isFolder(command[2])
+            );
+            if (!isValidOutput) {
+                // prompt for command
+                Log.print("Re-enter command");
+                command = promptForCommand(path, mp3Editor);
+            }
+            // if output valid then check file conflicts
+            else {
 
-        try {
-            value = Double.parseDouble(stringVal);
-        }
-        catch (Exception e) {
-            Log.errorE("Value entered is not a valid number. Try again", e);
-            promptForCommand("");
+                // cffAr and cffA commands handle name conflicts internally
+                if (!command[0].equals("ffAr") && !command[0].equals("ffA")){
+                    // check if there are name conflicts
+                    // (if conflicts exists then ask if overriding ok, if override not ok then skip file)
+                    mp3Editor.skipOverrideDenials(command[2]);
+                }
+            }
         }
 
-        return value;
+        return command;
     }
 }
