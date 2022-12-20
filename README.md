@@ -9,13 +9,32 @@ Currently only works with mp3 files.
 
 ## Usage
 
-To use BAE, users can download the "bulk.audio.editor.zip" Zip file from the release page [Bulk Audio Editor - release](https://github.com/jbeta02/bulk-audio-editor/releases).
-After unzipping, run the "Bulk Audio Editor.exe" to launch the program.
+To use BAE, users can download the "bulk.audio.editor.zip" Zip file from the release page 
+[Bulk Audio Editor - release](https://github.com/jbeta02/bulk-audio-editor/releases). After unzipping, 
+run the "Bulk Audio Editor.exe" to launch the program.
 
 <br />
 The EXE file needs to be alongside the temp, ffmpeg, and jar folders so
 if the tool needs to be moved it is recommended to move the tool from the top folder "Bulk Audio Editor".
 <br />
+
+#### Loudness Normalization Usage
+
+It is recommended to run the `DL` command before running `LN` or `LNN` so you can see the current loudness
+of the files. Unless you know the loudness you would like to target it is recommended to just use `LN` command
+which will set the integrated loudness to -16 LU, true peak to -2, and match the loudness range to the current target audio file.
+For reference, platforms such as Spotify use an integrated loudness value of -14 LU which is also common on other platforms. 
+If you are unsure, create a test folder with a few files then run the command and examine the results to see
+if they meet your needs. 
+
+#### Reversing actions
+
+Actions can not be undone using ctrl z. To reverse an action by BAE use the same command or the command inverse. 
+For example, to under an add name command use the remove command. To undo a modify album command use the modify album command
+again but specify the correct album name. 
+
+Revering or changing the affects of the loudness normalization command should be used with caution since constant
+changing of the file's loudness could result in generation loss after numerous changes. 
 
 
 ## Command Details
