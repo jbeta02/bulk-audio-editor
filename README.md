@@ -36,16 +36,20 @@ lead to a single mp3 file.
 - User can specify an output path for any command. 
 - Use the following syntax to add an output path: `-o [output path]`
 
+
 example: add text to end of files and save result in output folder
 
-```
-command: ab new- -o C:\a-folder\folder2
-```
+
+command: `ab new- -o C:\a-folder\folder2`
+
 
 result: 
 
-// add image here
 
+
+![result](https://user-images.githubusercontent.com/55860847/208598946-78a4ce65-46fb-4c76-b1c2-7de26bda0a5a.PNG)
+
+<br />
 
 #### Command List
 
