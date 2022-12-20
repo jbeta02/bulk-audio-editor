@@ -29,7 +29,7 @@ if they meet your needs.
 
 #### Reversing actions
 
-Actions can not be undone using ctrl z. To reverse an action by BAE use the same command or the command inverse. 
+Actions can NOT be undone using ctrl z in the target folder. To reverse an action by BAE use the same command or the command inverse. 
 For example, to under an add name command use the remove command. To undo a modify album command use the modify album command
 again but specify the correct album name. 
 
