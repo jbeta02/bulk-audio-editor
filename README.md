@@ -2,15 +2,15 @@
 
 ## Summary
 
-Bulk Audio Editor or BAE is a command line tool for editing audio files such as mp3 in bulk. 
+Bulk Audio Editor or BAE is a command line tool written in Java for editing audio files such as mp3 in bulk. 
 Users can edit metadata, organize the files in folders, display file data, and normalize the loudness of files.
 
 Currently only works with mp3 files. 
 
 ## Usage
 
-To use BAE users can download the "BAE for non-developers" repository then run the "Bulk Audio Editor.exe"
-inside the downloaded repository.
+To use BAE, users can download the "bulk-audio-editor-FND" repository then run the "Bulk Audio Editor.exe"
+inside the downloaded repository. see [Bulk Audio Editor-FND](https://github.com/jbeta02/bulk-audio-editor-FND) for details.
 
 <br />
 The EXE file needs to be alongside the temp, ffmpeg, and jar folders so
