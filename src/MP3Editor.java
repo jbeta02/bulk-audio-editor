@@ -9,20 +9,14 @@ import java.util.Comparator;
 
 // jaudiotagger is an external library for manipulating mp3 files
 import org.jaudiotagger.audio.AudioFileIO;
-import org.jaudiotagger.audio.exceptions.CannotReadException;
-import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
-import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
 import org.jaudiotagger.audio.mp3.MP3File;
 import org.jaudiotagger.tag.FieldKey;
 import org.jaudiotagger.tag.Tag;
-import org.jaudiotagger.tag.TagException;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
 // Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
-
-//TODO improve error for input related and unrelated errors handling and reporting
-
+//TODO make a parent class called AudioEditor then make MP3Editor a child class, also create FlacEditor child class
 public class MP3Editor {
 
     private ArrayList<MP3File> mp3Files = new ArrayList<>();

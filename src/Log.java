@@ -7,10 +7,10 @@ public class Log {
     // print headers
     private static final String LOG = "[ LOG ] ";
     private static final String ERROR = "<ERROR> ";
-    private static final String EXCEPTION_START = " | Error type";
+    private static final String EXCEPTION_START = " | Error type: ";
 
     // print format
-    private static final String FORMAT = "%-50s %s\n";
+    private static final String FORMAT = "%-30s %s\n";
 
     // general print functions for logging
 

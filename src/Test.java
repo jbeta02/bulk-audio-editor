@@ -1,7 +1,5 @@
 // Purpose: Quick testing class
 
-import java.io.IOException;
-
 public class Test {
     public static void main(String[] args) {
 
@@ -25,11 +23,5 @@ public class Test {
 
         //mp3Editor.normalizeLoudness(inputFile, -23, -2, outputFile); // default: -23, -2, 7 or preferred?: -16, -2, 7
 
-        try {
-            Double.parseDouble("abc");
-        }
-        catch (Exception e) {
-            Log.errorE("not double ", e);
-        }
     }
 }

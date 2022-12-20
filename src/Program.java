@@ -1,14 +1,14 @@
-// Purpose: Main program class, prompt for and run commands
-
 import java.io.File;
 import java.util.Scanner;
 
+// Purpose: Main program class, prompt for and run commands
+//TODO make an icon for exe file
 public class Program {
 
     private static Scanner input = new Scanner(System.in);
 
     // main method, provide user interface and run commands
-    public static void main(String[] args) { //TODO when Version 1 finished create a releases tag on GitHub
+    public static void main(String[] args) {
         MP3Editor mp3Editor;
         String[] command;
         String path;
@@ -28,7 +28,7 @@ public class Program {
         // prompt for command
         command = promptForCommand(mp3Editor.getInputPath(), mp3Editor); // command = array [command, commandInput, output path]
 
-        while(!command[0].equals("-q") & !command[0].equals("q")) {
+        while(!command[0].equals("q")) {
             switch(command[0]) {
                 case "ab":
                     mp3Editor.addToFileName(true, command[1], command[2]);
@@ -145,19 +145,19 @@ public class Program {
 
         System.out.printf(format, "-o [output path]: ", "Output modifier can be added to all commands to specify where to save output file(s) (see examples below)");
         System.out.printf(format, "", "\t\tWill be either folder or file path depending on the input path set");
-        System.out.printf(format, "ab [text]: ", "Add command beginning command will add [text] to beginning");
-        System.out.printf(format, "ae [text]: ", "Add command end command will add [text] to end");
+        System.out.printf(format, "ab [text]: ", "Add to beginning command will add [text] to beginning");
+        System.out.printf(format, "ae [text]: ", "Add to end command will add [text] to end");
         System.out.printf(format, "r [text]: ", "Remove command will remove [text] from files");
         System.out.printf(format, "Ar [artist text]: ", "Artist command will add [artist text] to artist metadata of files");
         System.out.printf(format, "A [album text]: ", "Album command will add [album text] to album metadata of files");
         System.out.printf(format, "G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
         System.out.printf(format, "Art [path to art]: ", "Art command will add art in [path to art] to art metadata of files");
         System.out.printf(format, "LN: ", "Loudness Normalize command will make loudness of files similar.");
-        System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LU.");
-        System.out.printf(format, "", "\t\tInternally, true peak set to -2 dBFS and loudness range set to match file's current range");
+        System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Will set loudness to -16 LU,");
+        System.out.printf(format, "", "\t\ttrue peak set to -2 dBFS and loudness range set to match file's current range");
         System.out.printf(format, "LNN [LUFS value]: ", "Loudness Normalize command (same as -LN but with custom loudness) will take a value in LU and bring the loudness of files to that target.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Recommended LU values are -24 to -14 (numbers closer to 0 are louder).");
-        System.out.printf(format, "", "\t\tInternally, true peak set to -2 dBFS and loudness range set to match file's current range\"");
+        System.out.printf(format, "", "\t\tTrue peak set to -2 dBFS and loudness range set to match file's current range");
         System.out.printf(format, "ffA: ", "Folders for album command will create folder for files based on their album then put the files in those folders");
         System.out.printf(format, "ffAr: ", "Folders for artist command will create folder for files based on their artist then put the files in those folders");
         System.out.printf(format, "DN: ", "Display by name command will display the metadata of the files organized by name");
@@ -166,8 +166,8 @@ public class Program {
         System.out.printf(format, "DG: ", "Display by genre command will display the metadata of the files organized by genre");
         System.out.printf(format, "DL: ", "Display by loudness command will display the metadata and loudness data of the files organized by loudest to quietest in LU");
         System.out.printf(format, "n [path to files]: ", "New command will select new set of files or file to target");
-        System.out.printf(format, "h or help: ", "Help command will display all command options and give their descriptions");
-        System.out.printf(format, "q or q: ", "Quit command will terminate program");
+        System.out.printf(format, "h: ", "Help command will display all command options and give their descriptions");
+        System.out.printf(format, "q: ", "Quit command will terminate program");
         System.out.println();
 
         System.out.println("Examples------------------------------------");
@@ -217,7 +217,7 @@ public class Program {
         String command = input.nextLine();
         String commandInput = "";
         String outputPath = "";
-        String[] fullCommand = {"", "", ""};
+        String[] fullCommand;
 
         // check if user entered output modifier
         if (command.contains(" -o ")) {
