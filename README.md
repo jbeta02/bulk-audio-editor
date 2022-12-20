@@ -9,8 +9,8 @@ Currently only works with mp3 files.
 
 ## Usage
 
-To use BAE, users can download the "bulk-audio-editor-FND" repository then run the "Bulk Audio Editor.exe"
-inside the downloaded repository. see [Bulk Audio Editor-FND](https://github.com/jbeta02/bulk-audio-editor-FND) for details.
+To use BAE, users can download the "bulk.audio.editor.zip" Zip file from the release page [Bulk Audio Editor - release](https://github.com/jbeta02/bulk-audio-editor/releases).
+After unzipping, run the "Bulk Audio Editor.exe" to launch the program.
 
 <br />
 The EXE file needs to be alongside the temp, ffmpeg, and jar folders so
