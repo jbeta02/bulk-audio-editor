@@ -16,8 +16,8 @@ public class LoudnessFile {
 
         // save loudness data
         measuredI = fFmpegWrapper.getMeasuredI();
-        measuredTp = fFmpegWrapper.getMeasuredLRA();
-        measuredLRA = fFmpegWrapper.getMeasuredTp();
+        measuredTp = fFmpegWrapper.getMeasuredTp();
+        measuredLRA = fFmpegWrapper.getMeasuredLRA();
 
         this.mp3File = mp3File;
     }

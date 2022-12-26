@@ -65,12 +65,12 @@ public class FFmpegWrapper {
 
                 // run command and save output to print
                 ArrayList<String> commandResult = runFfmpegCommand(passTwo);
-//            Log.print("running ffmpeg command (normalize loudness)", FFMPEG + arrayToString(passTwo));
+//                Log.print("running ffmpeg command (normalize loudness)", FFMPEG + arrayToString(passTwo));
 
                 // print output
-//            for (String outputLine : commandResult) {
-//                Log.print("command output", outputLine);
-//            }
+//                for (String outputLine : commandResult) {
+//                    Log.print("command output", outputLine);
+//                }
             }
             catch (Exception e) {
                 Log.errorE("error running ffmpeg", e);
