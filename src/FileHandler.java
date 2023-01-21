@@ -67,7 +67,7 @@ public class FileHandler {
 
             Scanner input = new Scanner(System.in);
 
-            UserFeedback.print("file " + outputFileName + " already exists in " + outputPath + ". Do you want to override existing file?");
+            UserFeedback.print("File \"" + outputFileName + "\" already exists in " + outputPath + ". Do you want to override existing file?");
             UserFeedback.print("Enter y or n: ");
 
             switch (input.nextLine()){

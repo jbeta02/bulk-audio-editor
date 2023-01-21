@@ -281,6 +281,9 @@ public class MP3Editor {
     private void displayDataByLoudness(Comparator<LoudnessFile> sortByCriteria) {
         ArrayList<LoudnessFile> mp3FilesSorted = new ArrayList<>();
 
+        // tell user that work is being done (add display before progress bar)
+        UserFeedback.print("processing...");
+
         // convert files in mp3Files to LoudnessFile then copy list of mp3Files to mp3FilesSorted
         for (int i = 0; i < mp3Files.size(); i++) {
             LoudnessFile loudnessFile = new LoudnessFile(mp3Files.get(i));
@@ -502,6 +505,9 @@ public class MP3Editor {
 
         // check if folder so we can build a path accordingly
         isOutputFolder = FileHandler.isFolder(outputPath);
+
+        // tell user that work is being done (add display before progress bar)
+        UserFeedback.print("processing...");
 
         // normalize loudness of all target files
         for (int i = 0; i < mp3Files.size(); i++) {
