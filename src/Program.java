@@ -14,7 +14,7 @@ public class Program {
         String path;
 
         // intro to program
-        System.out.println("Welcome to \"Bulk Audio Editor\"");
+        System.out.println("Welcome to \"Bulk Audio Editor\"     v1.0.0");
         System.out.println("-------------------------------");
         System.out.println("Enter path to a single Mp3 file or a folder holding MP3 files");
         System.out.println("(enter h for more information)");
