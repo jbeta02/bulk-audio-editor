@@ -49,19 +49,29 @@ public class FFmpegWrapper {
                 extractLoudnessStats(inputFile);
 
                 // setup ffmpeg command
-                String[] passTwo = {"-i", inputFile, "-af",
-                        "loudnorm=" +
+                String[] passTwo = {"-i", inputFile,
+                        //"-nostdin", // disable console interaction while command is being run
+                        "-y", // override output files without asking
+                        "-filter_complex", // will use filter loudnorm in following line
+                        "[0:0]loudnorm=" +
                                 "I=" + integrateLoudness +
                                 ":TP=" + truePeak +
                                 ":LRA=" + measuredLRA + // use measured LRA as target to force linear normalization
-                                ":measured_I=" + measuredI +
-                                ":measured_LRA=" + measuredLRA +
-                                ":measured_TP=" + measuredTp +
-                                ":measured_thresh=" + measuredThresh +
                                 ":offset=" + offset +
+                                ":measured_I=" + measuredI +
+                                ":measured_TP=" + measuredTp +
+                                ":measured_LRA=" + measuredLRA +
+                                ":measured_thresh=" + measuredThresh +
                                 ":linear=true" +
-                                ":print_format=json",
-                        "-hide_banner", "-y", "-ar", "48k", outputFile};
+                                ":print_format=json[norm0]",
+                        "-map", "[norm0]",
+                        "-c:a", // used for codec (audio copied as is)
+                        "libmp3lame", // set codec to mp3
+                        "-b:a", // used for codec
+                        "256k", // quality of file
+                        "-c:s", "copy", // copy audio and video streams of input to output without re-encoding
+                        outputFile, // output file
+                        "-hide_banner"}; // hide ffmpeg banner in output
 
                 // run command and save output to print
                 ArrayList<String> commandResult = runFfmpegCommand(passTwo);
@@ -82,16 +92,48 @@ public class FFmpegWrapper {
         }
     }
 
+    private void parseStreams(String inputFile) {
+        // setup ffmpeg command
+        String[] prePass = {"-i", inputFile,
+                "-c", "copy", // copy audio and video streams of input to output without re-encoding
+                "-t", "0", // used to specify duration
+                "-map", "0", // select which streams to use from input to use in output (in this case use all streams)
+                "-f", // force file format
+                "null", "NUL", // no output
+                "-hide_banner"}; // hide ffmpeg banner in output
+
+        // run command and save output to print
+        ArrayList<String> commandResult = runFfmpegCommand(prePass);
+//        Log.print("running ffmpeg command (parse streams)", FFMPEG + arrayToString(prePass));
+
+        // print output
+//        for (String outputLine : commandResult) {
+//            Log.print("command output", outputLine);
+//        }
+    }
+
     // get loudness stats of file, use getMeasured---() methods to get values after using this method
     public void extractLoudnessStats(String inputFile) {
+
+        // parse streams
+        parseStreams(inputFile);
+
         // setup ffmpeg command
-        String[] passOne = {"-i", inputFile, "-af",
-                "loudnorm=" +
+        String[] passOne = {"-i", inputFile,
+                //"-nostdin", // disable console interaction while command is being run
+                //"-y", // override output files without asking
+                "-filter_complex", // will use filter loudnorm in following line
+                "[0:0]loudnorm=" +
                         "I=" + INTEGRATED_LOUDNESS +
                         ":TP=" + TRUE_PEAK +
                         ":LRA=" + LOUDNESS_RANGE +
+                        ":offset=" + 0.0 +
                         ":print_format=json",
-                "-hide_banner", "-f", "null", "-"};
+                "-vn", // skip video
+                "-sn", // skip subtitles
+                "-f", // force file format
+                "null", "NUL",// no output
+                "-hide_banner"}; // hide ffmpeg banner in output
 
         // run command and save output to print
         ArrayList<String> commandResult = runFfmpegCommand(passOne);
