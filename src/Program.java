@@ -31,30 +31,37 @@ public class Program {
         while(!command[0].equals("q")) {
             switch(command[0]) {
                 case "ab":
+                    // add to beginning of file name
                     mp3Editor.addToFileName(true, command[1], command[2]);
                     break;
 
                 case "ae":
+                    // add to end of file name
                     mp3Editor.addToFileName(false, command[1], command[2]);
                     break;
 
                 case "r":
+                    // remove from file name
                     mp3Editor.removeFromFileName(command[1], command[2]);
                     break;
 
                 case "Ar":
+                    // modify artist
                     mp3Editor.modifyArtist(command[1], command[2]);
                     break;
 
                 case "A":
+                    // modify album
                     mp3Editor.modifyAlbum(command[1], command[2]);
                     break;
 
                 case "G":
+                    // modify genre
                     mp3Editor.modifyGenre(command[1], command[2]);
                     break;
 
                 case "Art":
+                    // change cover art
                     mp3Editor.changeArt(command[1], command[2]);
                     break;
 
@@ -79,34 +86,42 @@ public class Program {
                     break;
 
                 case "ffAr":
+                    // create folders by artist
                     mp3Editor.createFoldersByArtist(command[2]);
                     break;
 
                 case "ffA":
+                    // create folders by album
                     mp3Editor.createFoldersByAlbum(command[2]);
                     break;
 
                 case "DN":
+                    // display data by name
                     mp3Editor.displayDataByName();
                     break;
 
                 case "DAr":
+                    // display data by artist
                     mp3Editor.displayDataByArtist();
                     break;
 
                 case "DA":
+                    // display data by album
                     mp3Editor.displayDataByAlbum();
                     break;
 
                 case "DG":
+                    // display data by genre
                     mp3Editor.displayDataByGenre();
                     break;
 
                 case "DL":
+                    // display data by loudness
                     mp3Editor.displayDataByLoudness();
                     break;
 
                 case "n":
+                    // set new input path
                     mp3Editor.setInputPath(command[1]);
                     mp3Editor.setFiles(command[1]);
                     break;
@@ -125,6 +140,8 @@ public class Program {
 
         System.out.println("\nClosing Program...");
     }
+
+    // Program utility functions for assisting user
 
     // display a description of Bulk Audio Editor
     private static void displayAbout() {
