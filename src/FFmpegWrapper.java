@@ -55,15 +55,15 @@ public class FFmpegWrapper {
         if (ext.equalsIgnoreCase("mp3")) {
             // set codec and desired bit rate for mp3
             codec = SUPPORTED_CODECS[0];
-            bitrate[0] = "-b:a";
-            bitrate[1] = "256k";
+            bitrate[0] = "-b:a"; // used for bitrate
+            bitrate[1] = "256k"; // in kbps
         }
 
         // is flac
         else if (ext.equalsIgnoreCase("flac")) {
             // set codec and use current file bitrate
             codec = SUPPORTED_CODECS[1];
-            bitrate[0] = "";
+            bitrate[0] = ""; //TODO consider adding static bit rate instead of codec default
             bitrate[1] = "";
         }
 
@@ -96,11 +96,12 @@ public class FFmpegWrapper {
                         "-map", "[norm0]",
                         "-c:a", // used for codec (audio copied as is)
                         codec, // set codec to mp3
+                        bitrate[0], // used for bitrate
+                        bitrate[1], //
                         "-c:s", "copy", // copy audio and video streams of input to output without re-encoding
                         outputFile, // output file
                         "-hide_banner", // hide ffmpeg banner in output
-                        bitrate[0], // used for bitrate
-                        bitrate[1]}; // quality of file
+                };
 
                 // run command and save output to print
                 ArrayList<String> commandResult = runFfmpegCommand(passTwo);
@@ -112,7 +113,7 @@ public class FFmpegWrapper {
 //                }
             }
             catch (TimeoutException timeoutException) {
-                Log.error("ffmpeg timed-out on normalization process for file: " + inputFile);
+                Log.error("ffmpeg timed-out on normalization process for file: " + inputFile + ". Skipping process for file...");
             }
 //            catch (Exception e) {
 //                Log.errorE("error running ffmpeg", e);
@@ -146,7 +147,7 @@ public class FFmpegWrapper {
 //            }
         }
         catch (TimeoutException timeoutException) {
-            Log.error("ffmpeg timed-out on stream parsing process for file: " + inputFile);
+            Log.error("ffmpeg timed-out on stream parsing process for file: " + inputFile + ". Skipping process for file...");
         }
     }
 
@@ -194,7 +195,7 @@ public class FFmpegWrapper {
             offset = loudnessData.get(4).getValue();
         }
         catch (TimeoutException timeoutException) {
-            Log.error("ffmpeg timed-out on loudness values extraction process for file: " + inputFile);
+            Log.error("ffmpeg timed-out on loudness values extraction process for file: " + inputFile + ". Skipping process for file...");
         }
     }
 
