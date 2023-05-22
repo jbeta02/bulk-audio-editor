@@ -25,7 +25,7 @@ public class AudioEditor {
 
     private final String TEMP_FOLDER = "temp\\";
 
-    private final String[] SUPPORTED_CONTAINERS = {
+    private final String[] SUPPORTED_EXT = {
         "mp3",
         "flac",
     };
@@ -181,7 +181,7 @@ public class AudioEditor {
 
 
     // change album art
-    public void changeArt(String pathToArt, String outputPath) { //TODO need to test on flac
+    public void changeArt(String pathToArt, String outputPath) {
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
@@ -371,11 +371,62 @@ public class AudioEditor {
 
     // display methods ---------------------------------------------------------------
 
+    // display files sorted by name
+    public void displayDataByName() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using the file name
+        Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getFile().getName());
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by album name
+    public void displayDataByAlbum() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using album name
+        Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getTag().getFirst(FieldKey.ALBUM));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by artist name
+    public void displayDataByArtist() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using given artist name
+        Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getTag().getFirst(FieldKey.ARTIST));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by genre
+    public void displayDataByGenre() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using the genre
+        Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getTag().getFirst(FieldKey.GENRE));
+
+        // sort and display
+        displayDataBy(sortByCriteria);
+    }
+
+    // display files sorted by genre
+    public void displayDataByLoudness() {
+        // create sorting criteria using Comparator obj
+        // use lambda to compare mp3 files in the list using loudness
+        Comparator<LoudnessFile> sortByCriteria = Comparator.comparing(LoudnessFile -> LoudnessFile.getMeasuredI());
+
+        // sort and display
+        displayDataByLoudness(sortByCriteria.reversed());
+    }
+
+
     // display data order by given criteria
     public void displayDataBy(Comparator<AudioFile> sortByCriteria) {
         ArrayList<AudioFile> audioFilesSorted = new ArrayList<>();
 
-        // copy contents of mp3Files to mp3FilesSorted
+        // copy contents of audioFiles to audioFilesSorted
         for (AudioFile file : audioFiles) {
             audioFilesSorted.add(file);
         }
@@ -412,7 +463,7 @@ public class AudioEditor {
 
 
     // display data of all audio files in folder
-    private void displayData(ArrayList<AudioFile> files) {
+    private void displayData(ArrayList<AudioFile> files) { //TODO deal with long data text
         // print top data
         // folder name      total files
         if (files.size() > 0) {
@@ -444,7 +495,7 @@ public class AudioEditor {
 
         // print file data
         // name     artist      album   genre       len
-        for (AudioFile file : audioFiles) {
+        for (AudioFile file : files) {
             Tag tag = file.getTag();
 
             System.out.printf(format,
@@ -589,7 +640,7 @@ public class AudioEditor {
         String fileExtension = FileHandler.getFileExtension(file.getName());
         boolean supported = false;
 
-        for (String container : SUPPORTED_CONTAINERS) {
+        for (String container : SUPPORTED_EXT) {
             if (fileExtension.contains(container)) {
                 supported = true;
                 break;
@@ -616,7 +667,7 @@ public class AudioEditor {
 
         // check if path leads to folder
         if (file.isDirectory() & !file.isFile()) {
-            UserFeedback.print("Input path leads a to folder"); //TODO tell user what files types were found in folder
+            UserFeedback.print("Input path leads a to folder");
 
             // loop through files, convert each to AudioFile obj and add to arraylist
             for (File fileInLoop : file.listFiles()) {
@@ -641,7 +692,7 @@ public class AudioEditor {
 
         // check if path leads to file
         else if (!file.isDirectory() & file.isFile()) {
-            UserFeedback.print("Input path leads to a file"); //TODO tell user what type of file it is
+            UserFeedback.print("Input path leads to a file");
 
             // check if file is a supported file format
             if (FileHandler.isFile(file.getPath()) && fileSupported(file)) {
