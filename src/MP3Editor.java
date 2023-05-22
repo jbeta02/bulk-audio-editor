@@ -16,7 +16,6 @@ import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
 // Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
-//TODO make a parent class called AudioEditor then make MP3Editor a child class, also create FlacEditor child class
 public class MP3Editor {
 
     private ArrayList<MP3File> mp3Files = new ArrayList<>();
@@ -351,7 +350,7 @@ public class MP3Editor {
         // print top data
         // folder name      total files
         if (loudnessFilesFiles.size() > 0) {
-            System.out.printf("%s %-50s %s %s\n\n", "Path:", FileHandler.getPathNoName(loudnessFilesFiles.get(0).getMp3File().getFile()), "Total File Count:" , loudnessFilesFiles.size());
+            System.out.printf("%s %-50s %s %s\n\n", "Path:", FileHandler.getPathNoName(loudnessFilesFiles.get(0).getAudioFile().getFile()), "Total File Count:" , loudnessFilesFiles.size());
         }
         else {
             System.out.println("No files in folder");
@@ -386,14 +385,14 @@ public class MP3Editor {
         // print file data
         // name     artist      album   genre       len
         for (LoudnessFile file : loudnessFilesFiles) {
-            Tag tag = file.getMp3File().getTag();
+            Tag tag = file.getAudioFile().getTag();
 
             System.out.printf(format,
-                    file.getMp3File().getFile().getName(),
+                    file.getAudioFile().getFile().getName(),
                     tag.getFirst(FieldKey.ALBUM),
                     tag.getFirst(FieldKey.ARTIST),
                     tag.getFirst(FieldKey.GENRE),
-                    convertToMinSec(file.getMp3File().getAudioHeader().getTrackLength()),
+                    convertToMinSec(file.getAudioFile().getAudioHeader().getTrackLength()),
                     file.getMeasuredI(), // integrated loudness
                     file.getMeasuredTp(), // true peak
                     file.getMeasuredLRA() // loudness range

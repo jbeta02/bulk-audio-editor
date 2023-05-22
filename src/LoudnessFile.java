@@ -1,29 +1,29 @@
-import org.jaudiotagger.audio.mp3.MP3File;
+import org.jaudiotagger.audio.AudioFile;
 
-// Purpose: Class to bundle up an mp3File with loudness data
+// Purpose: Class to bundle up an audioFile with loudness data
 public class LoudnessFile {
 
-    private MP3File mp3File;
+    private AudioFile audioFile;
     private double measuredI; // measured integrated loudness
     private double measuredTp; // measured true peak
     private double measuredLRA; // measured loudness range
 
-    public LoudnessFile(MP3File mp3File) {
+    public LoudnessFile(AudioFile audioFile) {
         FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
 
         // run ffmpeg command to get loudness stats of file
-        fFmpegWrapper.extractLoudnessStats(mp3File.getFile().getPath());
+        fFmpegWrapper.extractLoudnessStats(audioFile.getFile().getPath());
 
         // save loudness data
         measuredI = fFmpegWrapper.getMeasuredI();
         measuredTp = fFmpegWrapper.getMeasuredTp();
         measuredLRA = fFmpegWrapper.getMeasuredLRA();
 
-        this.mp3File = mp3File;
+        this.audioFile = audioFile;
     }
 
-    public MP3File getMp3File() {
-        return mp3File;
+    public AudioFile getAudioFile() {
+        return audioFile;
     }
 
     public double getMeasuredI() {

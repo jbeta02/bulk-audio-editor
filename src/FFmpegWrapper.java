@@ -1,11 +1,14 @@
 import javafx.util.Pair;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
-// Purpose: Make FFmpeg easier to use for MP3Editor and specifically for loudness normalization
+// Purpose: Make FFmpeg easier to use for audio files and specifically for loudness normalization
 
 public class FFmpegWrapper {
 
@@ -24,6 +27,14 @@ public class FFmpegWrapper {
     private double measuredThresh;
     private double offset;
 
+    private String codec;
+    private final String[] SUPPORTED_CODECS = {
+            "libmp3lame", // for mp3
+            "flac",
+    };
+
+    private String[] bitrate = {"", ""};
+
     // references:
     // provides definitions to terms
     // https://en.wikipedia.org/wiki/Audio_normalization
@@ -37,6 +48,24 @@ public class FFmpegWrapper {
 
     // implementation of loudness normalization using ffmpeg
     public void normalizeLoudness(String inputFile, double integrateLoudness, double truePeak, String outputFile) {
+
+        String ext = inputFile.substring(inputFile.lastIndexOf(".") + 1);
+
+        // is mp3
+        if (ext.equalsIgnoreCase("mp3")) {
+            // set codec and desired bit rate for mp3
+            codec = SUPPORTED_CODECS[0];
+            bitrate[0] = "-b:a";
+            bitrate[1] = "256k";
+        }
+
+        // is flac
+        else if (ext.equalsIgnoreCase("flac")) {
+            // set codec and use current file bitrate
+            codec = SUPPORTED_CODECS[1];
+            bitrate[0] = "";
+            bitrate[1] = "";
+        }
 
         // check if values set successfully set
         if (setIntegratedLoudness(integrateLoudness) && setTruePeak(truePeak)) {
@@ -66,12 +95,12 @@ public class FFmpegWrapper {
                                 ":print_format=json[norm0]",
                         "-map", "[norm0]",
                         "-c:a", // used for codec (audio copied as is)
-                        "libmp3lame", // set codec to mp3
-                        "-b:a", // used for codec
-                        "256k", // quality of file
+                        codec, // set codec to mp3
                         "-c:s", "copy", // copy audio and video streams of input to output without re-encoding
                         outputFile, // output file
-                        "-hide_banner"}; // hide ffmpeg banner in output
+                        "-hide_banner", // hide ffmpeg banner in output
+                        bitrate[0], // used for bitrate
+                        bitrate[1]}; // quality of file
 
                 // run command and save output to print
                 ArrayList<String> commandResult = runFfmpegCommand(passTwo);
@@ -82,9 +111,12 @@ public class FFmpegWrapper {
 //                    Log.print("command output", outputLine);
 //                }
             }
-            catch (Exception e) {
-                Log.errorE("error running ffmpeg", e);
+            catch (TimeoutException timeoutException) {
+                Log.error("ffmpeg timed-out on normalization process for file: " + inputFile);
             }
+//            catch (Exception e) {
+//                Log.errorE("error running ffmpeg", e);
+//            }
         }
         // values not set successfully, tell user that command was skipped
         else {
@@ -93,66 +125,77 @@ public class FFmpegWrapper {
     }
 
     private void parseStreams(String inputFile) {
-        // setup ffmpeg command
-        String[] prePass = {"-i", inputFile,
-                "-c", "copy", // copy audio and video streams of input to output without re-encoding
-                "-t", "0", // used to specify duration
-                "-map", "0", // select which streams to use from input to use in output (in this case use all streams)
-                "-f", // force file format
-                "null", "NUL", // no output
-                "-hide_banner"}; // hide ffmpeg banner in output
 
-        // run command and save output to print
-        ArrayList<String> commandResult = runFfmpegCommand(prePass);
-//        Log.print("running ffmpeg command (parse streams)", FFMPEG + arrayToString(prePass));
+        try {
+            // setup ffmpeg command
+            String[] prePass = {"-i", inputFile,
+                    "-c", "copy", // copy audio and video streams of input to output without re-encoding
+                    "-t", "0", // used to specify duration
+                    "-map", "0", // select which streams to use from input to use in output (in this case use all streams)
+                    "-f", // force file format
+                    "null", "NUL", // no output
+                    "-hide_banner"}; // hide ffmpeg banner in output
 
-        // print output
-//        for (String outputLine : commandResult) {
-//            Log.print("command output", outputLine);
-//        }
+            // run command and save output to print
+            ArrayList<String> commandResult = runFfmpegCommand(prePass);
+//            Log.print("running ffmpeg command (parse streams)", FFMPEG + arrayToString(prePass));
+
+            // print output
+//            for (String outputLine : commandResult) {
+//                Log.print("command output", outputLine);
+//            }
+        }
+        catch (TimeoutException timeoutException) {
+            Log.error("ffmpeg timed-out on stream parsing process for file: " + inputFile);
+        }
     }
 
     // get loudness stats of file, use getMeasured---() methods to get values after using this method
     public void extractLoudnessStats(String inputFile) {
 
-        // parse streams
-        parseStreams(inputFile);
+        try {
+            // parse streams
+            parseStreams(inputFile);
 
-        // setup ffmpeg command
-        String[] passOne = {"-i", inputFile,
-                //"-nostdin", // disable console interaction while command is being run
-                //"-y", // override output files without asking
-                "-filter_complex", // will use filter loudnorm in following line
-                "[0:0]loudnorm=" +
-                        "I=" + INTEGRATED_LOUDNESS +
-                        ":TP=" + TRUE_PEAK +
-                        ":LRA=" + LOUDNESS_RANGE +
-                        ":offset=" + 0.0 +
-                        ":print_format=json",
-                "-vn", // skip video
-                "-sn", // skip subtitles
-                "-f", // force file format
-                "null", "NUL",// no output
-                "-hide_banner"}; // hide ffmpeg banner in output
+            // setup ffmpeg command
+            String[] passOne = {"-i", inputFile,
+                    //"-nostdin", // disable console interaction while command is being run
+                    //"-y", // override output files without asking
+                    "-filter_complex", // will use filter loudnorm in following line
+                    "[0:0]loudnorm=" +
+                            "I=" + INTEGRATED_LOUDNESS +
+                            ":TP=" + TRUE_PEAK +
+                            ":LRA=" + LOUDNESS_RANGE +
+                            ":offset=" + 0.0 +
+                            ":print_format=json",
+                    "-vn", // skip video
+                    "-sn", // skip subtitles
+                    "-f", // force file format
+                    "null", "NUL",// no output
+                    "-hide_banner"}; // hide ffmpeg banner in output
 
-        // run command and save output to print
-        ArrayList<String> commandResult = runFfmpegCommand(passOne);
-//        Log.print("running ffmpeg command (get loudness data)", FFMPEG + arrayToString(passOne));
+            // run command and save output to print
+            ArrayList<String> commandResult = runFfmpegCommand(passOne);
+//            Log.print("running ffmpeg command (get loudness data)", FFMPEG + arrayToString(passOne));
 
-        // print output
-//        for (String outputLine : commandResult) {
-//            Log.print("command output", outputLine);
-//        }
+            // print output
+//            for (String outputLine : commandResult) {
+//                Log.print("command output", outputLine);
+//            }
 
-        // grab data pairs (key, value)
-        ArrayList<Pair<String, Double>> loudnessData = extractDataPairs(commandResult);
+            // grab data pairs (key, value)
+            ArrayList<Pair<String, Double>> loudnessData = extractDataPairs(commandResult);
 
-        // save values from (key, value) so they can be accessed by outside processes
-        measuredI = loudnessData.get(0).getValue();
-        measuredTp = loudnessData.get(1).getValue();
-        measuredLRA = loudnessData.get(2).getValue();
-        measuredThresh = loudnessData.get(3).getValue();
-        offset = loudnessData.get(4).getValue();
+            // save values from (key, value) so they can be accessed by outside processes
+            measuredI = loudnessData.get(0).getValue();
+            measuredTp = loudnessData.get(1).getValue();
+            measuredLRA = loudnessData.get(2).getValue();
+            measuredThresh = loudnessData.get(3).getValue();
+            offset = loudnessData.get(4).getValue();
+        }
+        catch (TimeoutException timeoutException) {
+            Log.error("ffmpeg timed-out on loudness values extraction process for file: " + inputFile);
+        }
     }
 
     // private utility methods for class ----------------------------------------------
@@ -209,7 +252,7 @@ public class FFmpegWrapper {
     }
 
     // run an FFmpeg command and collect its output
-    private ArrayList<String> runFfmpegCommand(String[] args) {
+    public ArrayList<String> runFfmpegCommand(String[] args) throws TimeoutException{
         // ArrayList will hold output lines
         ArrayList<String> output = new ArrayList<>();
 
@@ -231,7 +274,11 @@ public class FFmpegWrapper {
             Process process = build.start();
 
             // wait for completion of FFmpeg command
-            process.waitFor();
+            boolean isCompleted = process.waitFor(60, TimeUnit.SECONDS); // timeout after 1 min
+
+            if (!isCompleted) {
+                throw new TimeoutException();
+            }
 
             // read exe output stream
             InputStream inputStream = process.getInputStream();
@@ -246,7 +293,7 @@ public class FFmpegWrapper {
             // close stream since no longer needed
             inputStream.close();
         }
-        catch (Exception e) {
+        catch (IOException | InterruptedException e) {
             Log.errorE("error running ffmpeg", e);
         }
 
@@ -318,7 +365,7 @@ public class FFmpegWrapper {
 
     //---------------
 
-    // following instance vars are set by ffmpeg so wrapper class does not need to check through mutators
+    // following instance vars are set by ffmpeg so this wrapper class does not need to use mutators
     public double getMeasuredI() {
         return measuredI;
     }
