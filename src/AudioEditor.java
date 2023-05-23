@@ -463,7 +463,7 @@ public class AudioEditor {
 
 
     // display data of all audio files in folder
-    private void displayData(ArrayList<AudioFile> files) { //TODO deal with long data text
+    private void displayData(ArrayList<AudioFile> files) {
         // print top data
         // folder name      total files
         if (files.size() > 0) {
@@ -499,10 +499,10 @@ public class AudioEditor {
             Tag tag = file.getTag();
 
             System.out.printf(format,
-                    file.getFile().getName(),
-                    tag.getFirst(FieldKey.ALBUM),
-                    tag.getFirst(FieldKey.ARTIST),
-                    tag.getFirst(FieldKey.GENRE),
+                    clipString(file.getFile().getName(), 50),
+                    clipString(tag.getFirst(FieldKey.ALBUM)),
+                    clipString(tag.getFirst(FieldKey.ARTIST)),
+                    clipString(tag.getFirst(FieldKey.GENRE)),
                     convertToMinSec(file.getAudioHeader().getTrackLength())
             );
         }
@@ -552,16 +552,30 @@ public class AudioEditor {
             Tag tag = file.getAudioFile().getTag();
 
             System.out.printf(format,
-                    file.getAudioFile().getFile().getName(),
-                    tag.getFirst(FieldKey.ALBUM),
-                    tag.getFirst(FieldKey.ARTIST),
-                    tag.getFirst(FieldKey.GENRE),
+                    clipString(file.getAudioFile().getFile().getName(), 50),
+                    clipString(tag.getFirst(FieldKey.ALBUM)),
+                    clipString(tag.getFirst(FieldKey.ARTIST)),
+                    clipString(tag.getFirst(FieldKey.GENRE)),
                     convertToMinSec(file.getAudioFile().getAudioHeader().getTrackLength()),
                     file.getMeasuredI(), // integrated loudness
                     file.getMeasuredTp(), // true peak
                     file.getMeasuredLRA() // loudness range
             );
         }
+    }
+
+
+    // clip string if it is longer than max, so it can be displayed better
+    private String clipString(String input, int max) {
+        if (input.length() > max) {
+            input = input.substring(0, max - 3) + "...";
+        }
+        return input;
+    }
+
+
+    private String clipString(String input) {
+        return clipString(input, 30);
     }
 
 
