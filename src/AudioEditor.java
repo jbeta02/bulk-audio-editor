@@ -45,8 +45,11 @@ public class AudioEditor {
     public void addToFileName(boolean addToStart, String textToAdd, String outputPath) {
         String currentName;
         String newName;
-        // will hold newly created files to set as new target mp3Files
+        // will hold newly created files to set as new target audioFiles
         String newFilesPath = "";
+
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
@@ -70,9 +73,9 @@ public class AudioEditor {
                 newName = currentName + textToAdd + extension;
             }
 
-            // get file properties from mp3 obj then get path
+            // get file properties from audioFile obj then get path
             Path oldFilePath = Paths.get(file.getFile().getPath());
-            // get file properties from mp3 obj then get path without a file name, add newName as file
+            // get file properties from audioFile obj then get path without a file name, add newName as file
             Path newFilePath = Paths.get(FileHandler.getPathNoName(file.getFile()), newName);
 
             try{
@@ -108,6 +111,9 @@ public class AudioEditor {
         String newName;
         // will hold newly created files to set as new target audioFiles
         String newFilesPath = "";
+
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
@@ -158,6 +164,9 @@ public class AudioEditor {
     // general algorithm for modifying metadata
     public void modifyMetadata(FieldKey fieldKey, String text, String outputPath) {
 
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
+
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
@@ -190,6 +199,9 @@ public class AudioEditor {
 
     // change album art
     public void changeArt(String pathToArt, String outputPath) {
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
+
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
@@ -222,8 +234,11 @@ public class AudioEditor {
     }
 
 
-    // normalize mp3 files, ask for integratedLoudness and truePeak
+    // normalize audio files, ask for integratedLoudness and truePeak
     public void normalizeFiles(double integratedLoudness, double truePeak, String outputPath) {
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
+
         // create ffmpegWrapper obj to run loudness normalization command
         FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
         boolean usingTemp = false;
@@ -315,6 +330,9 @@ public class AudioEditor {
         ArrayList<File> folders;
         String originalOutputPath = outputPath;
 
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
+
         // use output as input if user wants to keep work in input folder
         if (outputPath.equals("")) {
             outputPath = inputPath;
@@ -390,7 +408,7 @@ public class AudioEditor {
     // display files sorted by name
     public void displayDataByName() {
         // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using the file name
+        // use lambda to compare audio files in the list using the file name
         Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getFile().getName());
 
         // sort and display
@@ -400,7 +418,7 @@ public class AudioEditor {
     // display files sorted by album name
     public void displayDataByAlbum() {
         // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using album name
+        // use lambda to compare audio files in the list using album name
         Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getTag().getFirst(FieldKey.ALBUM));
 
         // sort and display
@@ -410,7 +428,7 @@ public class AudioEditor {
     // display files sorted by artist name
     public void displayDataByArtist() {
         // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using given artist name
+        // use lambda to compare audio files in the list using given artist name
         Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getTag().getFirst(FieldKey.ARTIST));
 
         // sort and display
@@ -420,7 +438,7 @@ public class AudioEditor {
     // display files sorted by genre
     public void displayDataByGenre() {
         // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using the genre
+        // use lambda to compare audio files in the list using the genre
         Comparator<AudioFile> sortByCriteria = Comparator.comparing(AudioFile -> AudioFile.getTag().getFirst(FieldKey.GENRE));
 
         // sort and display
@@ -430,7 +448,7 @@ public class AudioEditor {
     // display files sorted by genre
     public void displayDataByLoudness() {
         // create sorting criteria using Comparator obj
-        // use lambda to compare mp3 files in the list using loudness
+        // use lambda to compare audio files in the list using loudness
         Comparator<LoudnessFile> sortByCriteria = Comparator.comparing(LoudnessFile -> LoudnessFile.getMeasuredI());
 
         // sort and display
@@ -441,6 +459,9 @@ public class AudioEditor {
     // display data order by given criteria
     public void displayDataBy(Comparator<AudioFile> sortByCriteria) {
         ArrayList<AudioFile> audioFilesSorted = new ArrayList<>();
+
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
 
         // copy contents of audioFiles to audioFilesSorted
         for (AudioFile file : audioFiles) {
@@ -457,6 +478,9 @@ public class AudioEditor {
     // display data order by given criteria using loudnessFile
     private void displayDataByLoudness(Comparator<LoudnessFile> sortByCriteria) {
         ArrayList<LoudnessFile> audioFilesSorted = new ArrayList<>();
+
+        // make sure audioFiles are updated to any changes made to files in input path
+        setFiles(getInputPath());
 
         // tell user that work is being done (add display before progress bar)
         UserFeedback.print("processing...");
@@ -597,7 +621,7 @@ public class AudioEditor {
 
     // private utility methods for class ----------------------------------------------
 
-    // copy mp3 files to a set output path
+    // copy audio files to a set output path
     private void copyFilesToOutput(String outputPath) {
         if (!outputPath.equals("")) {
             // loop through files and move to new location
