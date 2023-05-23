@@ -33,8 +33,6 @@ public class FFmpegWrapper {
             "flac",
     };
 
-    private String[] bitrate = {"", ""};
-
     // references:
     // provides definitions to terms
     // https://en.wikipedia.org/wiki/Audio_normalization
@@ -51,6 +49,8 @@ public class FFmpegWrapper {
 
         String ext = inputFile.substring(inputFile.lastIndexOf(".") + 1);
 
+        String[] bitrate = {"", ""};
+
         // is mp3
         if (ext.equalsIgnoreCase("mp3")) {
             // set codec and desired bit rate for mp3
@@ -63,8 +63,7 @@ public class FFmpegWrapper {
         else if (ext.equalsIgnoreCase("flac")) {
             // set codec and use current file bitrate
             codec = SUPPORTED_CODECS[1];
-            bitrate[0] = ""; // use codec default for bitrate
-            bitrate[1] = "";
+            // don't set specific bitrate instead use default bitrate for codec
         }
 
         // check if values set successfully set
