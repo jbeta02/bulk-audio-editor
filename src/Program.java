@@ -279,6 +279,8 @@ public class Program {
             }
             // if output valid then check file conflicts
             else {
+                // output is valid so update audio files to any changes made by user in between commands
+                audioEditor.setFiles(audioEditor.getInputPath());
 
                 // cffAr and cffA commands handle name conflicts internally
                 if (!command[0].equals("ffAr") && !command[0].equals("ffA")){
@@ -287,6 +289,12 @@ public class Program {
                     audioEditor.skipOverrideDenials(command[2]);
                 }
             }
+        }
+        else {
+            // since no output was specified input path will be used as output.
+            // input has already been verified so assume safe.
+            // update audio files to any changes made by user in between commands
+            audioEditor.setFiles(audioEditor.getInputPath());
         }
 
         return command;
