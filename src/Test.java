@@ -1,27 +1,28 @@
 // Purpose: Quick testing class
 
+import org.jaudiotagger.tag.FieldKey;
+
 public class Test {
     public static void main(String[] args) {
 
-        MP3Editor mp3Editor = new MP3Editor("test-mp3/out23-This Fffire.mp3"); // test-mp3/
-        //MP3Editor mp3Editor = new MP3Editor("test-mp3/");
+        // add \" for ffmpeg direct inputs and no \" when entering as path such as for FileHandler stuff
 
-        //mp3Editor.removeFromFileName("2");
+        String inputFlac = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-1\\20 - Misa no Tema A.flac";
+        String inputMp3 = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-1\\20 - Misa no Theme A.mp3";
 
-        //mp3Editor.displayData();
+        String inputPath = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-1";
 
-//        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-The Reason.mp3\"";
-//        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out23-The Reason.mp3\"";
+        String outPath = "F:\\Software\\Java Apps\\MP3Editor\\test-out";
 
-//        String inputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\in-She's Back.mp3\"";
-//        String outputFile = "\"F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out23-She's Back.mp3\"";
-//
-        // add \" for ffmpgeg direct inputs and no \" when entering as path such as for FileHandler stuff
-        String inputFile = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\"; // F:\Software\Java Apps\MP3Editor\test-mp3\out23-This Fffire.mp3
-        String outputFile = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3\\out23-This Fffire.mp3";
-        String outputPath = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-2\\"; // F:\Software\Java Apps\MP3Editor\test-mp3-2
+        AudioEditor audioEditor = new AudioEditor(inputPath);
 
-        //mp3Editor.normalizeLoudness(inputFile, -23, -2, outputFile); // default: -23, -2, 7 or preferred?: -16, -2, 7
+        //audioEditor.displayDataByLoudness();
+
+        audioEditor.normalizeFiles(outPath);
+
+        //audioEditor.displayDataByLoudness();
+
+        //audioEditor.displayDataByAlbum();
 
     }
 }

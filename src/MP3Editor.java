@@ -15,6 +15,7 @@ import org.jaudiotagger.tag.Tag;
 import org.jaudiotagger.tag.images.Artwork;
 import org.jaudiotagger.tag.images.ArtworkFactory;
 
+@Deprecated // deprecated in favor on AudioEditor
 // Purpose: Provide means to modify an MP3 file. Modifications include name, metadata, and volume.
 public class MP3Editor {
 

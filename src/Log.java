@@ -2,8 +2,6 @@
 
 public class Log {
 
-    //TODO improve log functions so they are more user friendly and not just for developer use
-
     // print headers
     private static final String LOG = "[ LOG ] ";
     private static final String ERROR = "<ERROR> ";
