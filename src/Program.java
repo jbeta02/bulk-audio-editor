@@ -1,20 +1,21 @@
+import org.jaudiotagger.tag.FieldKey;
+
 import java.io.File;
 import java.util.Scanner;
 
 // Purpose: Main program class, prompt for and run commands
-//TODO make an icon for exe file
 public class Program {
 
     private static Scanner input = new Scanner(System.in);
 
     // main method, provide user interface and run commands
     public static void main(String[] args) {
-        MP3Editor mp3Editor;
+        AudioEditor audioEditor;
         String[] command;
         String path;
 
         // intro to program
-        System.out.println("Welcome to \"Bulk Audio Editor\"     v1.0.0");
+        System.out.println("Welcome to \"Bulk Audio Editor\"     v1.1.0");
         System.out.println("-------------------------------");
         System.out.println("Enter path to a single Mp3 file or a folder holding MP3 files");
         System.out.println("(enter h for more information)");
@@ -23,51 +24,51 @@ public class Program {
         path = promptForPath();
 
         // create mp3Editor obj and inter path to mp3 files as constructor argument
-        mp3Editor = new MP3Editor(path);
+        audioEditor = new AudioEditor(path);
 
         // prompt for command
-        command = promptForCommand(mp3Editor.getInputPath(), mp3Editor); // command = array [command, commandInput, output path]
+        command = promptForCommand(audioEditor.getInputPath(), audioEditor); // command = array [command, commandInput, output path]
 
         while(!command[0].equals("q")) {
             switch(command[0]) {
                 case "ab":
                     // add to beginning of file name
-                    mp3Editor.addToFileName(true, command[1], command[2]);
+                    audioEditor.addToFileName(true, command[1], command[2]);
                     break;
 
                 case "ae":
                     // add to end of file name
-                    mp3Editor.addToFileName(false, command[1], command[2]);
+                    audioEditor.addToFileName(false, command[1], command[2]);
                     break;
 
                 case "r":
                     // remove from file name
-                    mp3Editor.removeFromFileName(command[1], command[2]);
+                    audioEditor.removeFromFileName(command[1], command[2]);
                     break;
 
                 case "Ar":
                     // modify artist
-                    mp3Editor.modifyArtist(command[1], command[2]);
+                    audioEditor.modifyMetadata(FieldKey.ARTIST, command[1], command[2]);
                     break;
 
                 case "A":
                     // modify album
-                    mp3Editor.modifyAlbum(command[1], command[2]);
+                    audioEditor.modifyMetadata(FieldKey.ALBUM, command[1], command[2]);
                     break;
 
                 case "G":
                     // modify genre
-                    mp3Editor.modifyGenre(command[1], command[2]);
+                    audioEditor.modifyMetadata(FieldKey.GENRE, command[1], command[2]);
                     break;
 
                 case "Art":
                     // change cover art
-                    mp3Editor.changeArt(command[1], command[2]);
+                    audioEditor.changeArt(command[1], command[2]);
                     break;
 
                 // normalize using default value of -16 LU
                 case "LN":
-                    mp3Editor.normalizeFiles(command[2]);
+                    audioEditor.normalizeFiles(command[2]);
                     break;
 
                 // normalize with custom loudness
@@ -78,52 +79,52 @@ public class Program {
                     }
                     catch (Exception e) {
                         Log.errorE("Value entered is not a valid number. Try again", e);
-                        command = promptForCommand(mp3Editor.getInputPath(), mp3Editor);
+                        command = promptForCommand(audioEditor.getInputPath(), audioEditor);
                     }
                     // enter custom loudness as double
                     double loudnessValue = Double.parseDouble(command[1]);
-                    mp3Editor.normalizeFiles(loudnessValue, command[2]);
+                    audioEditor.normalizeFiles(loudnessValue, command[2]);
                     break;
 
                 case "ffAr":
                     // create folders by artist
-                    mp3Editor.createFoldersByArtist(command[2]);
+                    audioEditor.createFoldersFor(FieldKey.ARTIST, command[2]);
                     break;
 
                 case "ffA":
                     // create folders by album
-                    mp3Editor.createFoldersByAlbum(command[2]);
+                    audioEditor.createFoldersFor(FieldKey.ALBUM, command[2]);
                     break;
 
                 case "DN":
                     // display data by name
-                    mp3Editor.displayDataByName();
+                    audioEditor.displayDataByName();
                     break;
 
                 case "DAr":
                     // display data by artist
-                    mp3Editor.displayDataByArtist();
+                    audioEditor.displayDataByArtist();
                     break;
 
                 case "DA":
                     // display data by album
-                    mp3Editor.displayDataByAlbum();
+                    audioEditor.displayDataByAlbum();
                     break;
 
                 case "DG":
                     // display data by genre
-                    mp3Editor.displayDataByGenre();
+                    audioEditor.displayDataByGenre();
                     break;
 
                 case "DL":
                     // display data by loudness
-                    mp3Editor.displayDataByLoudness();
+                    audioEditor.displayDataByLoudness();
                     break;
 
                 case "n":
                     // set new input path
-                    mp3Editor.setInputPath(command[1]);
-                    mp3Editor.setFiles(command[1]);
+                    audioEditor.setInputPath(command[1]);
+                    audioEditor.setFiles(command[1]);
                     break;
 
                 case "h":
@@ -135,7 +136,7 @@ public class Program {
                     System.out.println("(List of commands can be produced using \"h\" command)\n");
                     break;
             }
-            command = promptForCommand(mp3Editor.getInputPath(), mp3Editor);
+            command = promptForCommand(audioEditor.getInputPath(), audioEditor);
         }
 
         System.out.println("\nClosing Program...");
@@ -228,7 +229,7 @@ public class Program {
     }
 
     // prompt for command, returns [command, commandInput, outputPath] as array
-    private static String[] promptForCommand(String currInputPath, MP3Editor mp3Editor) {
+    private static String[] promptForCommand(String currInputPath, AudioEditor audioEditor) {
         System.out.println("\nCurrent target path: " + currInputPath);
         System.out.print("\nEnter command: ");
         String command = input.nextLine();
@@ -257,13 +258,13 @@ public class Program {
         fullCommand = new String[]{command, commandInput, outputPath};
 
         // if an output path is specified that make sure it is logical and there are no name conflicts
-        fullCommand = checkOutputValidity(fullCommand, currInputPath, mp3Editor);
+        fullCommand = checkOutputValidity(fullCommand, currInputPath, audioEditor);
 
         return fullCommand;
     }
 
     // check for valid output path then check if there are file conflicts
-    private static String[] checkOutputValidity(String[] command, String path, MP3Editor mp3Editor) {
+    private static String[] checkOutputValidity(String[] command, String path, AudioEditor audioEditor) {
         // check for valid output path then check if there are file conflicts
         if (!command[2].equals("")) {
             // first check output
@@ -274,7 +275,7 @@ public class Program {
             if (!isValidOutput) {
                 // prompt for command
                 UserFeedback.print("re-enter command");
-                command = promptForCommand(path, mp3Editor);
+                command = promptForCommand(path, audioEditor);
             }
             // if output valid then check file conflicts
             else {
@@ -283,7 +284,7 @@ public class Program {
                 if (!command[0].equals("ffAr") && !command[0].equals("ffA")){
                     // check if there are name conflicts
                     // (if conflicts exists then ask if overriding ok, if override not ok then skip file)
-                    mp3Editor.skipOverrideDenials(command[2]);
+                    audioEditor.skipOverrideDenials(command[2]);
                 }
             }
         }
