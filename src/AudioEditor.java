@@ -14,6 +14,8 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+//TODO setFiles before and after every method to keep audioFiles updated in case user modifies files in between method calls
+
 // Purpose: Provide means to modify an audio file. Modifications include name, metadata, and loudness.
 // Currently, supports mp3 and flac
 public class AudioEditor {
@@ -159,6 +161,11 @@ public class AudioEditor {
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
+        // use output as input if user wants to keep work in input folder
+        if (outputPath.equals("")) {
+            outputPath = inputPath;
+        }
+
         for (AudioFile file : audioFiles) {
             // get tag which contains metadata
             Tag tag = file.getTag();
@@ -175,6 +182,7 @@ public class AudioEditor {
                 Log.errorE("Unable to set new metadata text \"" + text + "\" for file \"" + file.getFile().getName() + "\"", e);
             }
         }
+
         // set output as target files
         setFiles(outputPath);
     }
@@ -184,6 +192,11 @@ public class AudioEditor {
     public void changeArt(String pathToArt, String outputPath) {
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
+
+        // use output as input if user wants to keep work in input folder
+        if (outputPath.equals("")) {
+            outputPath = inputPath;
+        }
 
         for (AudioFile file : audioFiles) {
             // get tag which contains metadata
@@ -203,6 +216,9 @@ public class AudioEditor {
                 Log.errorE("Unable to set art cover using path: " + pathToArt + " for file \"" + file.getFile().getName() + "\"", e);
             }
         }
+
+        // set output as target files
+        setFiles(outputPath);
     }
 
 
@@ -299,7 +315,7 @@ public class AudioEditor {
         ArrayList<File> folders;
         String originalOutputPath = outputPath;
 
-        // use output as input if user wants to keep work input folder
+        // use output as input if user wants to keep work in input folder
         if (outputPath.equals("")) {
             outputPath = inputPath;
         }
