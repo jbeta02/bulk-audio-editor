@@ -95,7 +95,7 @@ public class FFmpegWrapper {
                                 ":print_format=json[norm0]",
                         "-map", "[norm0]",
                         "-c:a", // used for codec (audio copied as is)
-                        codec, // set codec to mp3
+                        codec, // set codec
                         bitrate[0], // used for bitrate
                         bitrate[1], //
                         "-c:s", "copy", // copy audio and video streams of input to output without re-encoding

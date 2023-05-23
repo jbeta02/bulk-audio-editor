@@ -17,13 +17,13 @@ public class Program {
         // intro to program
         System.out.println("Welcome to \"Bulk Audio Editor\"     v1.1.0");
         System.out.println("-------------------------------");
-        System.out.println("Enter path to a single Mp3 file or a folder holding MP3 files");
+        System.out.println("Enter path to a single Audio file or a folder holding Audio files");
         System.out.println("(enter h for more information)");
 
         // prompt for valid path
         path = promptForPath();
 
-        // create mp3Editor obj and inter path to mp3 files as constructor argument
+        // create AudioEditor obj and inter path to audio files as constructor argument
         audioEditor = new AudioEditor(path);
 
         // prompt for command
@@ -146,7 +146,7 @@ public class Program {
 
     // display a description of Bulk Audio Editor
     private static void displayAbout() {
-        System.out.print("\n\"Bulk Audio Editor\" is a tool to help edit and manage audio files in bulk. \n" +
+        System.out.print("\n\"Bulk Audio Editor\" is a tool to help edit and manage audio files in bulk. (Currently supports flac and mp3) \n" +
                 "A user can enter a path to a folder holding audio files such as mp3 then run commands that can edit metadata such as: \n" +
                 "- Album\n" +
                 "- Artist\n" +
