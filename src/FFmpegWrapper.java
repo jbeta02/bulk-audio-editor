@@ -63,7 +63,7 @@ public class FFmpegWrapper {
         else if (ext.equalsIgnoreCase("flac")) {
             // set codec and use current file bitrate
             codec = SUPPORTED_CODECS[1];
-            bitrate[0] = ""; //TODO consider adding static bit rate instead of codec default
+            bitrate[0] = ""; // use codec default for bitrate
             bitrate[1] = "";
         }
 
