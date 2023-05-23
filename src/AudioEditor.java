@@ -14,8 +14,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Comparator;
 
-//TODO setFiles before and after every method to keep audioFiles updated in case user modifies files in between method calls
-
 // Purpose: Provide means to modify an audio file. Modifications include name, metadata, and loudness.
 // Currently, supports mp3 and flac
 public class AudioEditor {
@@ -47,9 +45,6 @@ public class AudioEditor {
         String newName;
         // will hold newly created files to set as new target audioFiles
         String newFilesPath = "";
-
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
@@ -112,9 +107,6 @@ public class AudioEditor {
         // will hold newly created files to set as new target audioFiles
         String newFilesPath = "";
 
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
-
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
@@ -164,9 +156,6 @@ public class AudioEditor {
     // general algorithm for modifying metadata
     public void modifyMetadata(FieldKey fieldKey, String text, String outputPath) {
 
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
-
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
 
@@ -199,8 +188,6 @@ public class AudioEditor {
 
     // change album art
     public void changeArt(String pathToArt, String outputPath) {
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
 
         // if an output path was set then copy files over
         copyFilesToOutput(outputPath);
@@ -236,8 +223,6 @@ public class AudioEditor {
 
     // normalize audio files, ask for integratedLoudness and truePeak
     public void normalizeFiles(double integratedLoudness, double truePeak, String outputPath) {
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
 
         // create ffmpegWrapper obj to run loudness normalization command
         FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
@@ -329,9 +314,6 @@ public class AudioEditor {
     public void createFoldersFor(FieldKey fieldKey, String outputPath) {
         ArrayList<File> folders;
         String originalOutputPath = outputPath;
-
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
 
         // use output as input if user wants to keep work in input folder
         if (outputPath.equals("")) {
@@ -460,9 +442,6 @@ public class AudioEditor {
     public void displayDataBy(Comparator<AudioFile> sortByCriteria) {
         ArrayList<AudioFile> audioFilesSorted = new ArrayList<>();
 
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
-
         // copy contents of audioFiles to audioFilesSorted
         for (AudioFile file : audioFiles) {
             audioFilesSorted.add(file);
@@ -478,9 +457,6 @@ public class AudioEditor {
     // display data order by given criteria using loudnessFile
     private void displayDataByLoudness(Comparator<LoudnessFile> sortByCriteria) {
         ArrayList<LoudnessFile> audioFilesSorted = new ArrayList<>();
-
-        // make sure audioFiles are updated to any changes made to files in input path
-        setFiles(getInputPath());
 
         // tell user that work is being done (add display before progress bar)
         UserFeedback.print("processing...");
