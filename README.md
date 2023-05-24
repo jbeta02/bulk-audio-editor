@@ -3,7 +3,7 @@
 ## Summary
 
 Bulk Audio Editor or BAE is a command line tool written in Java for editing and managing audio files in bulk. 
-Users can edit names names of files, edit metadata, organize the files in folders, display file data, and normalize the loudness of files.
+Users can edit names of files, edit metadata, organize the files in folders, display file data, and normalize the loudness of files.
 
 Currently supports with mp3 files. 
 
@@ -125,11 +125,11 @@ command again to see the result of the previous command. The results can also be
 
 The user wants all their music to have a similar loudness so they can listen without changing the volume between songs. 
 They use the `DN` command to see the files organised by name that will be changed (see first and second arrow). The user then uses the `DL`
-command to display the loudness data in addition to the meta data, notice that the integrated loudness of all the files is different
+command to display the loudness data in addition to the metadata, notice that the integrated loudness of all the files is different
 (see fourth arrow). The `LN` command is used to perfom the loudness normalization process. The `LN` command sets the integrated loudness to -16 LU, 
 true peak to -2 dBFS, and matches the loudness range that already exists within the file. The user in this case does not use the output modifer, however,
 it is recommended to use the output modifer to keep the original files safe incase you are not satsified with the loudness change. Finally, the user uses the 
-`DL` to see the results of the operation, notice that that the integrated loudness of the files are -16 (see sixth arrow).
+`DL` to see the results of the operation, notice that the integrated loudness of the files are -16 (see sixth arrow).
 
 #### Create Folders
 
