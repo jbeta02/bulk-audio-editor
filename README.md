@@ -135,8 +135,17 @@ it is recommended to use the output modifer to keep the original files safe inca
 
 ![folder-creation](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/81b9c526-d1ef-432e-aaea-43600e5bb652)
 
-//TODO continue here
+![Screenshot 2023-05-23 152349](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/bfb6c4f0-50af-4d22-838b-35425f8c74d3)
 
+![Screenshot 2023-05-23 151806](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/2b8356fd-2f4e-4439-8ff3-3363e244d2cc)
+
+
+The user wants to create folders for their audio files based on the album of the files. They first check the albums of the files using display name command 
+(`DN`) a better option would be to use the `DA` command which displays the files based on the album name. Look at second arrow to see the albums of the files. 
+The user uses the `ffA` (folders for album) command to create a folder for each unique album found amoung the target files. Notice that the third arrow shows that the after the
+folders were created there were no more target files in the input path specified. To continue working on the files use the new command (`n`) and specify a new path to keep 
+wokring on the files. The third image shows the folders created, notice that the files were placed in the folders since the output modifer was not used. If the output modifer was used
+then copies of the files would be placed in folders created in the output path specified. 
 
 ## Notes
 
@@ -147,7 +156,7 @@ of the files. Unless you know the loudness you would like to target it is recomm
 which will set the integrated loudness to -16 LU, true peak to -2, and match the loudness range to the current target audio file.
 For reference, platforms such as Spotify use an integrated loudness value of -14 LU which is also common on other platforms. 
 If you are unsure, create a test folder with a few files then run the command and examine the results to see
-if they meet your needs. 
+if they meet your needs. Short emplaination of loudness normalization: https://en.wikipedia.org/wiki/Audio_normalization
 
 #### Reversing actions
 
@@ -156,10 +165,38 @@ For example, to undo an add name command use the remove command. To undo a modif
 again but specify the correct album name. 
 
 Revering or changing the affects of the loudness normalization command should be used with caution since constant
-changing of the file's loudness could result in generation loss after numerous changes. 
+changing of the file's loudness could result in generation loss after numerous loudness changes. 
+
+#### Override Protections
+
+![overrride-protection](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/2e8e4430-4f42-42a1-a2a4-91d007eb4eea)
+
+![Screenshot 2023-05-22 212959](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/86a20a7d-3325-4a4e-8ca2-9bcb1db78f11)
+
+![Screenshot 2023-05-23 151206](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/de518abb-1dbf-46ff-baaf-a706e6bc4aa0)
+
+
+When the ouput modifer is used an there is a potential conflict when one or more files having being the same, BAE will ask the user 
+if overriding is acceptable. For example, If two folders hold the same three files and the user wants to change the change the album name of their
+files they can do so without worrying about conflicts. Looking at the above example, the user displays the files in the input folder then attempts to 
+change the ablum name to "z" using the ouput modifer to direct the ouput. They find the the output folder already contains the files. The user decides
+that they only want to modify "Song A.mp3" and leave the others untouched. 
+
+#### Adapt To User Changes
+
+BAE will update its targets if the user changes any of the files or its contents between command runs. BAE will check if 
+there were any changes before every command is ran, so it is always up to date. 
+
+#### Target Changes To Output
+
+When the output modifer is used on a command, the target will change from the input path initially set to the output path set through the output modifer. 
+This should make it easier to follow the flow of the work being done on the files. 
+
 
 ## How It Works
 
-This project uses jaudiotagger for interacting with mp3 and flac files and editing metadata. FFmpeg is used for
-normalizing loudness and displaying loudness data. The project can be ran as a JAR file as long as the temp and 
-ffmpeg folder and alongside the JAR file. The host machine will also need to have JRE 1.8.0
+- This project uses jaudiotagger for interacting with mp3 and flac files and editing metadata
+- FFmpeg is used for normalizing loudness and displaying loudness data
+- Launch4j is used to create the executable
+
+For those how wish to clone the host machine will need to have Java 1.8 to run jaudiotagger
