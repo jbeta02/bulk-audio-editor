@@ -33,7 +33,7 @@ command [command input] -o [output path]
 
 - The output modifier can be used on all commands except display commands, the new command, the help command, and the quit command. 
 - Use the following syntax to add an output path: `-o [output path]`
-- Note: When an ouput path is specified the target file/folder will change to the given output afte the command is ran. 
+- Note: When an output path is specified the target file/folder will change to the given output afte the command is ran. 
 
 example of command with output modifier: `ab new- -o C:\a-folder\folder2`
 
@@ -126,9 +126,9 @@ command again to see the result of the previous command. The results can also be
 The user wants all their music to have a similar loudness so they can listen without changing the volume between songs. 
 They use the `DN` command to see the files organised by name that will be changed (see first and second arrow). The user then uses the `DL`
 command to display the loudness data in addition to the metadata, notice that the integrated loudness of all the files is different
-(see fourth arrow). The `LN` command is used to perfom the loudness normalization process. The `LN` command sets the integrated loudness to -16 LU, 
-true peak to -2 dBFS, and matches the loudness range that already exists within the file. The user in this case does not use the output modifer, however,
-it is recommended to use the output modifer to keep the original files safe incase you are not satsified with the loudness change. Finally, the user uses the 
+(see fourth arrow). The `LN` command is used to perform the loudness normalization process. The `LN` command sets the integrated loudness to -16 LU, 
+true peak to -2 dBFS, and matches the loudness range that already exists within the file. The user in this case does not use the output modifier, however,
+it is recommended to use the output modifier to keep the original files safe in case you are not satisfied with the loudness change. Finally, the user uses the 
 `DL` to see the results of the operation, notice that the integrated loudness of the files are -16 (see sixth arrow).
 
 #### Create Folders
@@ -144,7 +144,7 @@ The user wants to create folders for their audio files based on the album of the
 (`DN`) a better option would be to use the `DA` command which displays the files based on the album name. Look at second arrow to see the albums of the files. 
 The user uses the `ffA` (folders for album) command to create a folder for each unique album found amoung the target files. Notice that the third arrow shows that the after the
 folders were created there were no more target files in the input path specified. To continue working on the files use the new command (`n`) and specify a new path to keep 
-wokring on the files. The third image shows the folders created, notice that the files were placed in the folders since the output modifer was not used. If the output modifer was used
+wokring on the files. The third image shows the folders created, notice that the files were placed in the folders since the output modifer was not used. If the output modifier was used
 then copies of the files would be placed in folders created in the output path specified. 
 
 ## Notes
@@ -156,7 +156,7 @@ of the files. Unless you know the loudness you would like to target it is recomm
 which will set the integrated loudness to -16 LU, true peak to -2, and match the loudness range to the current target audio file.
 For reference, platforms such as Spotify use an integrated loudness value of -14 LU which is also common on other platforms. 
 If you are unsure, create a test folder with a few files then run the command and examine the results to see
-if they meet your needs. Short emplaination of loudness normalization: https://en.wikipedia.org/wiki/Audio_normalization
+if they meet your needs. Short explanation of loudness normalization: https://en.wikipedia.org/wiki/Audio_normalization
 
 #### Reversing actions
 
@@ -176,20 +176,20 @@ changing of the file's loudness could result in generation loss after numerous l
 ![Screenshot 2023-05-23 151206](https://github.com/jbeta02/bulk-audio-editor/assets/55860847/de518abb-1dbf-46ff-baaf-a706e6bc4aa0)
 
 
-When the ouput modifer is used an there is a potential conflict when one or more files having being the same, BAE will ask the user 
-if overriding is acceptable. For example, If two folders hold the same three files and the user wants to change the change the album name of their
+When the output modifier is used an there is a potential conflict when one or more files having being the same, BAE will ask the user 
+if overriding is acceptable. For example, If two folders hold the same three files and the user wants to change the album name of their
 files they can do so without worrying about conflicts. Looking at the above example, the user displays the files in the input folder then attempts to 
-change the ablum name to "z" using the ouput modifer to direct the ouput. They find the the output folder already contains the files. The user decides
+change the album name to "z" using the output modifier to direct the output. They find  the output folder already contains the files. The user decides
 that they only want to modify "Song A.mp3" and leave the others untouched. 
 
 #### Adapt To User Changes
 
 BAE will update its targets if the user changes any of the files or its contents between command runs. BAE will check if 
-there were any changes before every command is ran, so it is always up to date. 
+there were any changes before every command is ran, so it is always up-to-date. 
 
 #### Target Changes To Output
 
-When the output modifer is used on a command, the target will change from the input path initially set to the output path set through the output modifer. 
+When the output modifier is used on a command, the target will change from the input path initially set to the output path set through the output modifer. 
 This should make it easier to follow the flow of the work being done on the files. 
 
 
