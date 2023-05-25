@@ -86,6 +86,11 @@ public class Program {
                     audioEditor.normalizeFiles(loudnessValue, command[2]);
                     break;
 
+                // convert file to mp3
+                case "ToMP3":
+                    audioEditor.convertToMP3(command[2]);
+                    break;
+
                 case "ffAr":
                     // create folders by artist
                     audioEditor.createFoldersFor(FieldKey.ARTIST, command[2]);

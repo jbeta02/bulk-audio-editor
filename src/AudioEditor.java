@@ -293,6 +293,79 @@ public class AudioEditor {
     }
 
 
+    public void convertToMP3(String outputPath) {
+        // create ffmpegWrapper obj to run conversion command
+        FFmpegWrapper fFmpegWrapper = new FFmpegWrapper();
+        boolean usingTemp = false;
+        boolean isOutputFolder;
+        String originalOutPath;
+
+        // used temp as output path if no output path is set by user
+        if (outputPath.equals("")) {
+            outputPath = TEMP_FOLDER;
+            usingTemp = true;
+        }
+
+        // save original path since it will be overridden later
+        originalOutPath = outputPath;
+
+        // check if folder so we can build a path accordingly
+        isOutputFolder = FileHandler.isFolder(outputPath);
+
+        // tell user that work is being done (add display before progress bar)
+        UserFeedback.print("processing...");
+
+        // convert target files
+        for (int i = 0; i < audioFiles.size(); i++) {
+            // if outputPath is a folder then will need to change to file specific path for ffmpeg
+            if (isOutputFolder) {
+                // add name of curr file with mp3 extension to path
+                String fileName = audioFiles.get(i).getFile().getName();
+                fileName = fileName.substring(0, fileName.lastIndexOf("."));
+                outputPath = FileHandler.createPath(outputPath, fileName + ".mp3");
+            }
+            else {
+                // add mp3 extension to name of curr file
+
+                // remove curr name from path
+                String fileName = audioFiles.get(i).getFile().getName();
+                outputPath = outputPath.replace(fileName, "");
+
+                // replace curr extension with mp3
+                fileName = fileName.substring(0, fileName.lastIndexOf(".")) + ".mp3";
+
+                // build new path
+                outputPath = FileHandler.createPath(outputPath, fileName);
+            }
+
+            // run convertToMP3 command
+            fFmpegWrapper.convertToMP3(audioFiles.get(i).getFile().getPath(), outputPath);
+
+            // create progress bar
+            UserFeedback.progressBar("Progress Converting Files to mp3", i + 1, audioFiles.size());
+
+            // reset output path
+            outputPath = originalOutPath;
+        }
+
+        // (not needed if an output path is specified)
+        // copied normalized files from temp to input then delete files in temp
+        if (usingTemp) {
+            setFiles(TEMP_FOLDER);
+            copyFilesToOutput(inputPath);
+            for (File file : FileHandler.getFile(TEMP_FOLDER).listFiles()) {
+                if (file.isFile()) {
+                    file.delete();
+                }
+            }
+        }
+        else {
+            setInputPath(originalOutPath);
+            setFiles(outputPath);
+        }
+    }
+
+
     // go through files and look for conflicts
     // if conflicts exists ask user if override is allowed
     // take files out of list if file isn't allowed to be overwritten

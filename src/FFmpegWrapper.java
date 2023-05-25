@@ -27,11 +27,12 @@ public class FFmpegWrapper {
     private double measuredThresh;
     private double offset;
 
-    private String codec;
     private final String[] SUPPORTED_CODECS = {
             "libmp3lame", // for mp3
             "flac",
     };
+
+    private String mp3Bitrate = "320k";
 
     // references:
     // provides definitions to terms
@@ -51,12 +52,14 @@ public class FFmpegWrapper {
 
         String[] bitrate = {"", ""};
 
+        String codec = "noCodecSet";
+
         // is mp3
         if (ext.equalsIgnoreCase("mp3")) {
             // set codec and desired bit rate for mp3
             codec = SUPPORTED_CODECS[0];
             bitrate[0] = "-b:a"; // used for bitrate
-            bitrate[1] = "256k"; // in kbps
+            bitrate[1] = mp3Bitrate; // in kbps
         }
 
         // is flac
@@ -198,6 +201,33 @@ public class FFmpegWrapper {
         }
     }
 
+    public void convertToMP3(String inputFile, String outputFile) {
+        try {
+            // setup ffmpeg command
+            String[] convert = {"-i", inputFile,
+                    "-y", // override output files without asking
+                    "-c:a", // used for codec (audio copied as is)
+                    SUPPORTED_CODECS[0], // set codec
+                    "-b:a", // used for bitrate
+                    mp3Bitrate, // set bitrate value
+                    outputFile, // output file
+                    "-hide_banner", // hide ffmpeg banner in output
+            };
+
+            // run command and save output to print
+            ArrayList<String> commandResult = runFfmpegCommand(convert);
+//            Log.print("running ffmpeg command (parse streams)", FFMPEG + arrayToString(prePass));
+
+            // print output
+//            for (String outputLine : commandResult) {
+//                Log.print("command output", outputLine);
+//            }
+        }
+        catch (TimeoutException timeoutException) {
+            Log.error("ffmpeg timed-out on file conversion process for file: " + inputFile + ". Skipping process for file...");
+        }
+    }
+
     // private utility methods for class ----------------------------------------------
 
     // extract json data pairs from output
@@ -274,7 +304,7 @@ public class FFmpegWrapper {
             Process process = build.start();
 
             // wait for completion of FFmpeg command
-            boolean isCompleted = process.waitFor(60, TimeUnit.SECONDS); // timeout after 1 min
+            boolean isCompleted = process.waitFor(90, TimeUnit.SECONDS); // timeout after 1.5 min
 
             if (!isCompleted) {
                 throw new TimeoutException();
