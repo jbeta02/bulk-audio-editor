@@ -10,7 +10,7 @@ public class Test {
         String inputFlac = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-1\\20 - Misa no Tema A.flac";
         String inputMp3 = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-1\\20 - Misa no Theme A.mp3";
 
-        String inputPath = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-1";
+        String inputPath = "F:\\Software\\Java Apps\\MP3Editor\\test-mp3-2";
 
         String outPath = "F:\\Software\\Java Apps\\MP3Editor\\test-out";
 
@@ -18,7 +18,7 @@ public class Test {
 
         //audioEditor.displayDataByLoudness();
 
-        audioEditor.normalizeFiles(outPath);
+        audioEditor.convertToMP3(outPath);
 
         //audioEditor.displayDataByLoudness();
 

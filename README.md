@@ -33,13 +33,13 @@ command [command input] -o [output path]
 
 - The output modifier can be used on all commands except display commands, the new command, the help command, and the quit command. 
 - Use the following syntax to add an output path: `-o [output path]`
-- Note: When an output path is specified the target file/folder will change to the given output afte the command is ran. 
+- Note: When an output path is specified the target file/folder will change to the given output after the command is ran. 
 
 example of command with output modifier: `ab new- -o C:\a-folder\folder2`
 
 ## Command List
 
-Commands can be organized into 6 categories: Edit Name, Edit Metadata, Edit Loudness, Create Folders, Display Data, and Program Utility
+Commands can be organized into 7 categories: Edit Name, Edit Metadata, Edit Loudness, Convert Files, Create Folders, Display Data, and Program Utility
 
 #### Edit Name
 `ab [text]` Add to beginning command will add [text] to beginning of file name
@@ -49,6 +49,8 @@ Commands can be organized into 6 categories: Edit Name, Edit Metadata, Edit Loud
 `r [text]` Remove command will remove [text] from file name
 
 #### Edit Metadata
+`T [title text]` Title command will add [title text] to title metadata of files
+
 `Ar [artist text]` Artist command will add [artist text] to artist metadata of files
 
 `A [album text]` Album command will add [album text] to album metadata of files
@@ -65,6 +67,9 @@ true peak set to -2 dBFS and loudness range set to match file's current range.
 `LNN [LUFS value]` Loudness Normalize command (same as -LN but with custom loudness) 
 will take a value in LU and bring the loudness of files to that target. This will allow user to listen to music without needing to change the volume. 
 Recommended LU values are -24 to -14 (numbers closer to 0 are louder). True peak set to -2 dBFS and loudness range set to match file's current range.
+
+#### Conversion
+`ToMP3` To MP3 command will convert supported files to mp3
 
 #### Create Folders
 `ffA` Folders for album command will create folder for files based on their album then put the files in those folders
@@ -142,9 +147,9 @@ it is recommended to use the output modifier to keep the original files safe in 
 
 The user wants to create folders for their audio files based on the album of the files. They first check the albums of the files using display name command 
 (`DN`) a better option would be to use the `DA` command which displays the files based on the album name. Look at second arrow to see the albums of the files. 
-The user uses the `ffA` (folders for album) command to create a folder for each unique album found amoung the target files. Notice that the third arrow shows that the after the
+The user uses the `ffA` (folders for album) command to create a folder for each unique album found among the target files. Notice that the third arrow shows that the after the
 folders were created there were no more target files in the input path specified. To continue working on the files use the new command (`n`) and specify a new path to keep 
-wokring on the files. The third image shows the folders created, notice that the files were placed in the folders since the output modifer was not used. If the output modifier was used
+wokring on the files. The third image shows the folders created, notice that the files were placed in the folders since the output modifier was not used. If the output modifier was used
 then copies of the files would be placed in folders created in the output path specified. 
 
 ## Notes
