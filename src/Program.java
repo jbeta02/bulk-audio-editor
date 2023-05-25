@@ -46,6 +46,11 @@ public class Program {
                     audioEditor.removeFromFileName(command[1], command[2]);
                     break;
 
+                case "T":
+                    // modify title
+                    audioEditor.modifyMetadata(FieldKey.TITLE, command[1], command[2]);
+                    break;
+
                 case "Ar":
                     // modify artist
                     audioEditor.modifyMetadata(FieldKey.ARTIST, command[1], command[2]);
@@ -171,6 +176,7 @@ public class Program {
         System.out.printf(format, "ab [text]: ", "Add to beginning command will add [text] to beginning");
         System.out.printf(format, "ae [text]: ", "Add to end command will add [text] to end");
         System.out.printf(format, "r [text]: ", "Remove command will remove [text] from files");
+        System.out.printf(format, "T [title text]: ", "Title command will add [title text] to title metadata of files");
         System.out.printf(format, "Ar [artist text]: ", "Artist command will add [artist text] to artist metadata of files");
         System.out.printf(format, "A [album text]: ", "Album command will add [album text] to album metadata of files");
         System.out.printf(format, "G [genre text]: ", "Genre command will add [genre text] to genre metadata of files");
@@ -180,7 +186,8 @@ public class Program {
         System.out.printf(format, "", "\t\ttrue peak set to -2 dBFS and loudness range set to match file's current range");
         System.out.printf(format, "LNN [LUFS value]: ", "Loudness Normalize command (same as -LN but with custom loudness) will take a value in LU and bring the loudness of files to that target.");
         System.out.printf(format, "", "\t\tThis will allow user to listen to music without needing to change the volume. Recommended LU values are -24 to -14 (numbers closer to 0 are louder).");
-        System.out.printf(format, "", "\t\tTrue peak set to -2 dBFS and loudness range set to match file's current range");
+        System.out.printf(format, "", "\t\tTrue peak set to -2 dBFS and loudness range set to match file's current range.");
+        System.out.printf(format, "ToMP3: ", "To MP3 command will convert supported files to mp3");
         System.out.printf(format, "ffA: ", "Folders for album command will create folder for files based on their album then put the files in those folders");
         System.out.printf(format, "ffAr: ", "Folders for artist command will create folder for files based on their artist then put the files in those folders");
         System.out.printf(format, "DN: ", "Display by name command will display the metadata of the files organized by name");
