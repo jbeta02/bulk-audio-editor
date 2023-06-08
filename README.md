@@ -39,7 +39,7 @@ example of command with output modifier: `ab new- -o C:\a-folder\folder2`
 
 ## Command List
 
-Commands can be organized into 7 categories: Edit Name, Edit Metadata, Edit Loudness, Convert Files, Create Folders, Display Data, and Program Utility
+Commands can be organized into **7 categories**: **Edit Name**, **Edit Metadata**, **Edit Loudness**, **Convert Files**, **Create Folders**, **Display Data**, and **Program Utility**
 
 #### Edit Name
 `ab [text]` Add to beginning command will add [text] to beginning of file name
