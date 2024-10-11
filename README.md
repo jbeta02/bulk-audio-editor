@@ -204,4 +204,4 @@ This should make it easier to follow the flow of the work being done on the file
 - FFmpeg is used for normalizing loudness and displaying loudness data
 - Launch4j is used to create the executable
 
-For those how wish to clone the host machine will need to have Java 1.8 to run jaudiotagger
+For those who wish to clone the host machine will need to have Java 1.8 to run jaudiotagger
